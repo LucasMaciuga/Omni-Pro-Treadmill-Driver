@@ -58,12 +58,21 @@ vr::EVRInitError TreadmillServerDriver::Init(vr::IVRDriverContext* pDriverContex
         
         Log("treadmill: OmniBridge.dll loaded from: %s", dllPath);
 
-        // Load all functions
+        // Load all functions with detailed debugging
         pfnCreate = (PFN_OmniReader_Create)GetProcAddress(omniReaderLib, "OmniReader_Create");
+        if (!pfnCreate) Log("treadmill: GetProcAddress failed for OmniReader_Create");
+        
         pfnInitialize = (PFN_OmniReader_Initialize)GetProcAddress(omniReaderLib, "OmniReader_Initialize");
+        if (!pfnInitialize) Log("treadmill: GetProcAddress failed for OmniReader_Initialize");
+        
         pfnRegisterCallback = (PFN_OmniReader_RegisterCallback)GetProcAddress(omniReaderLib, "OmniReader_RegisterCallback");
+        if (!pfnRegisterCallback) Log("treadmill: GetProcAddress failed for OmniReader_RegisterCallback");
+        
         pfnDisconnect = (PFN_OmniReader_Disconnect)GetProcAddress(omniReaderLib, "OmniReader_Disconnect");
+        if (!pfnDisconnect) Log("treadmill: GetProcAddress failed for OmniReader_Disconnect");
+        
         pfnDestroy = (PFN_OmniReader_Destroy)GetProcAddress(omniReaderLib, "OmniReader_Destroy");
+        if (!pfnDestroy) Log("treadmill: GetProcAddress failed for OmniReader_Destroy");
 
         if (!pfnCreate || !pfnInitialize || !pfnRegisterCallback || !pfnDisconnect || !pfnDestroy) {
             Log("treadmill: Not all functions could be loaded from OmniBridge.dll");
