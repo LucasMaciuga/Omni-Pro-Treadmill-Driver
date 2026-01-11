@@ -82,5 +82,6 @@
     <None Include="..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\treadmill\bin\win64\driver_treadmill.dll">
       <Filter>Ressourcendateien\bin</Filter>
     </None>
+    <None Include="README.md" />
   </ItemGroup>
 </Project>

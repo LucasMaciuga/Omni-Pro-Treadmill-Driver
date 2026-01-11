@@ -144,6 +144,7 @@
     <None Include="..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\treadmill\resources\icons\treadmill.svg" />
     <None Include="OmniBridge\bin\Release\net10.0\win-x64\OmniBridge.dll" />
     <None Include="OmniBridge\bin\Release\net10.0\win-x64\OmniCommon.dll" />
+    <None Include="README.md" />
     <None Include="treadmill\resources\input\bindings_treadmill_controller.json" />
     <None Include="treadmill\resources\input\legacy_bindings.json" />
     <None Include="treadmill\resources\input\steam.app.611670.json" />

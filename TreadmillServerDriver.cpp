@@ -9,7 +9,7 @@ vr::EVRInitError TreadmillServerDriver::Init(vr::IVRDriverContext* pDriverContex
     try {
         VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
 
-        // Debug-Flag aus Settings laden
+        // Load debug flag from settings
         if (vr::VRSettings()) {
             vr::EVRSettingsError se = vr::VRSettingsError_None;
             bool debugEnabled = vr::VRSettings()->GetBool("driver_treadmill", "debug", &se);
@@ -22,7 +22,7 @@ vr::EVRInitError TreadmillServerDriver::Init(vr::IVRDriverContext* pDriverContex
         
         Log("treadmill: Init called");
 
-        // DLL-Pfad aus Settings laden (Standard: hardcoded path)
+        // Load DLL path from settings (default: hardcoded path)
         char dllPath[512];
         strcpy_s(dllPath, sizeof(dllPath), "C:\\Program Files (x86)\\Steam\\steamapps\\common\\SteamVR\\drivers\\treadmill\\bin\\win64\\OmniBridge.dll");
         
@@ -41,11 +41,11 @@ vr::EVRInitError TreadmillServerDriver::Init(vr::IVRDriverContext* pDriverContex
             }
         }
         
-        // Konvertiere char* zu wchar_t* für LoadLibrary
+        // Convert char* to wchar_t* for LoadLibrary
         wchar_t wDllPath[512];
         MultiByteToWideChar(CP_UTF8, 0, dllPath, -1, wDllPath, 512);
 
-        // Lade OmniBridge.dll
+        // Load OmniBridge.dll
         omniReaderLib = LoadLibrary(wDllPath);
 
         if (!omniReaderLib) {
@@ -58,7 +58,7 @@ vr::EVRInitError TreadmillServerDriver::Init(vr::IVRDriverContext* pDriverContex
         
         Log("treadmill: OmniBridge.dll loaded from: %s", dllPath);
 
-        // Lade alle Funktionen
+        // Load all functions
         pfnCreate = (PFN_OmniReader_Create)GetProcAddress(omniReaderLib, "OmniReader_Create");
         pfnInitialize = (PFN_OmniReader_Initialize)GetProcAddress(omniReaderLib, "OmniReader_Initialize");
         pfnRegisterCallback = (PFN_OmniReader_RegisterCallback)GetProcAddress(omniReaderLib, "OmniReader_RegisterCallback");
@@ -66,18 +66,18 @@ vr::EVRInitError TreadmillServerDriver::Init(vr::IVRDriverContext* pDriverContex
         pfnDestroy = (PFN_OmniReader_Destroy)GetProcAddress(omniReaderLib, "OmniReader_Destroy");
 
         if (!pfnCreate || !pfnInitialize || !pfnRegisterCallback || !pfnDisconnect || !pfnDestroy) {
-            Log("treadmill: Nicht alle Funktionen konnten aus OmniBridge.dll geladen werden");
+            Log("treadmill: Not all functions could be loaded from OmniBridge.dll");
             FreeLibrary(omniReaderLib);
             omniReaderLib = nullptr;
             return vr::VRInitError_Driver_Failed;
         }
 
-        // Omni Reader initialisieren
+        // Initialize OmniReader
         m_omniReader = pfnCreate();
         if (m_omniReader) {
             pfnRegisterCallback(m_omniReader, OnOmniData);
             
-            // COM-Port aus Settings laden (Standard: "COM3")
+            // Load COM port from settings (default: "COM3")
             char comPort[64] = "COM3";
             if (vr::VRSettings()) {
                 vr::EVRSettingsError se = vr::VRSettingsError_None;
@@ -95,15 +95,15 @@ vr::EVRInitError TreadmillServerDriver::Init(vr::IVRDriverContext* pDriverContex
             }
             
             if (pfnInitialize(m_omniReader, comPort, 0, 115200)) {
-                Log("treadmill: Omni Reader connected on %s", comPort);
+                Log("treadmill: OmniReader connected on %s", comPort);
             } else {
-                Log("treadmill: Omni Reader failed to initialize on %s", comPort);
+                Log("treadmill: OmniReader failed to initialize on %s", comPort);
             }
         } else {
             Log("treadmill: OmniReader_Create failed");
         }
 
-        // 1. Treadmill-Controller (unsichtbar, für Inputs)
+        // 1. Treadmill-Controller (invisible, for inputs)
         m_device = std::make_unique<TreadmillDevice>(0);
         
         vr::IVRServerDriverHost* pDriverHost = vr::VRServerDriverHost();
@@ -119,7 +119,7 @@ vr::EVRInitError TreadmillServerDriver::Init(vr::IVRDriverContext* pDriverContex
         );
         Log("treadmill: Controller added: %s", added ? "true" : "false");
 
-        // 2. NEU: Visualisierungs-Tracker (sichtbar)
+        // 2. NEW: Visualization tracker (visible)
         m_visualTracker = std::make_unique<TreadmillVisualTracker>();
         
         bool trackerAdded = pDriverHost->TrackedDeviceAdded(
@@ -162,7 +162,7 @@ const char* const* TreadmillServerDriver::GetInterfaceVersions() {
 }
 
 void TreadmillServerDriver::RunFrame() {
-    // Controller Input Updates
+    // Controller input updates
     if (m_device && m_device->m_unObjectId != vr::k_unTrackedDeviceIndexInvalid) {
         m_device->UpdateInputs();
         vr::DriverPose_t pose = m_device->GetPose();
@@ -170,7 +170,7 @@ void TreadmillServerDriver::RunFrame() {
             m_device->m_unObjectId, pose, sizeof(vr::DriverPose_t));
     }
     
-    // NEU: Visual Tracker Pose Updates
+    // NEW: Visual tracker pose updates
     if (m_visualTracker && m_visualTracker->m_unObjectId != vr::k_unTrackedDeviceIndexInvalid) {
         vr::DriverPose_t trackerPose = m_visualTracker->GetPose();
         vr::VRServerDriverHost()->TrackedDevicePoseUpdated(

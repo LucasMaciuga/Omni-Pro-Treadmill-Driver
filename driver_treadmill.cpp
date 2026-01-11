@@ -29,10 +29,10 @@ struct XYState {
     float y_smoothed = 0.0f;
     float yaw_smoothed = 0.0f;
     
-    uint64_t dataId = 0;  // Timestamp/ID für Tracing
-    uint64_t logCounter = 0;  // Gemeinsamer Log-Counter für alle Komponenten
+    uint64_t dataId = 0;  // Timestamp/ID for tracing
+    uint64_t logCounter = 0;  // Shared log counter for all components
     
-    // Movement tracking für Richtungsanalyse
+    // Movement tracking for direction analysis
     float lastHmdX = 0.0f;
     float lastHmdZ = 0.0f;
     bool hmdInitialized = false;
@@ -134,10 +134,10 @@ void TreadmillDevice::UpdateInputs() {
         logCounter = g_state.logCounter;
     }
 
-    // KORREKTUR: Die Joystick-Werte werden NICHT rotiert!
-    // Die Rotation passiert über die Pose-Rotation des Controllers
-    // X = Seitwärts (links/rechts auf dem Treadmill)
-    // Y = Vorwärts/Rückwärts (auf dem Treadmill)
+    // CORRECTION: Joystick values are NOT rotated!
+    // Rotation happens through the controller's pose rotation
+    // X = Sideways (left/right on the treadmill)
+    // Y = Forward/Backward (on the treadmill)
     
     float factor = g_speedFactor.load();
     float sx = std::clamp(x * factor, -1.0f, 1.0f);
@@ -152,13 +152,13 @@ void TreadmillDevice::UpdateInputs() {
         if (e != vr::VRInputError_None) Log("treadmill: UpdateScalar Y failed %d", e);
     }
     
-    // Einheitliches Logging alle 50 Frames
+    // Unified logging every 50 frames
     if (logCounter % 50 == 0) {
-        // ANALYSE: Ist Bewegung korrekt zur Rotation?
-        // Wenn yaw=0° und Y=1.0 (vorwärts) -> sollte nach Norden gehen
-        // Wenn yaw=90° und Y=1.0 (vorwärts) -> sollte nach Osten gehen
-        // Wenn yaw=180° und Y=1.0 (vorwärts) -> sollte nach Süden gehen
-        Log("treadmill: [UpdateInputs #%llu] Controller Yaw=%.1f° | Joystick X=%.3f Y=%.3f | Expected: Y=vorwärts auf Treadmill, X=seitwärts",
+        // ANALYSIS: Is movement correct relative to rotation?
+        // If yaw=0° and Y=1.0 (forward) -> should move north
+        // If yaw=90° and Y=1.0 (forward) -> should move east
+        // If yaw=180° and Y=1.0 (forward) -> should move south
+        Log("treadmill: [UpdateInputs #%llu] Controller Yaw=%.1f° | Joystick X=%.3f Y=%.3f | Expected: Y=forward on treadmill, X=sideways",
             logCounter, yawDeg, sx, sy);
     }
 }
@@ -310,13 +310,13 @@ vr::DriverPose_t TreadmillDevice::GetPose() {
         m_pose.deviceIsConnected = true;
         m_pose.result = vr::TrackingResult_Running_OK;
 
-        // Position bleibt bei (0,0,0) - der Controller bewegt sich nicht im Raum
+        // Position remains at (0,0,0) - the controller does not move in space
         m_pose.vecPosition[0] = 0.0;
         m_pose.vecPosition[1] = 0.0;
         m_pose.vecPosition[2] = 0.0;
 
-        // WICHTIG: Die Rotation des Controllers zeigt an, in welche Richtung der Treadmill zeigt
-        // Das Spiel interpretiert dann: "Joystick nach vorne" + "Controller zeigt nach Osten" = "Bewege dich nach Osten"
+        // IMPORTANT: The controller's rotation indicates which direction the treadmill is pointing
+        // The game then interprets: "Joystick forward" + "Controller points east" = "Move east"
         constexpr double DEG2RAD = 3.14159265358979323846 / 180.0;
         double theta = static_cast<double>(rawYaw) * DEG2RAD;
         
@@ -324,14 +324,14 @@ vr::DriverPose_t TreadmillDevice::GetPose() {
         double c = std::cos(half);
         double s = std::sin(half);
         
-        // Rotation um Y-Achse - NEGATIVES Vorzeichen, da Treadmill in entgegengesetzte Richtung dreht
+        // Rotation around Y-axis - NEGATIVE sign because treadmill rotates in opposite direction
         m_pose.qRotation.w = c;
         m_pose.qRotation.x = 0.0;
-        m_pose.qRotation.y = -s;  // GEÄNDERT: von s zu -s
+        m_pose.qRotation.y = -s;  // CHANGED: from s to -s
         m_pose.qRotation.z = 0.0;
     }
     
-    // Debug-Logging NACH dem Lock
+    // Debug logging AFTER lock
     static int frameCount = 0;
     if (++frameCount % 100 == 0) {
         Log("treadmill: [TreadmillDevice::GetPose ID=%llu] SMOOTHED yaw=%.2f° | CALC quat(w=%.4f, x=%.4f, y=%.4f, z=%.4f)",
@@ -344,7 +344,7 @@ vr::DriverPose_t TreadmillDevice::GetPose() {
 
 void OnOmniData(float ringAngle, int gamePadX, int gamePadY)
 {
-    // Timestamp für Tracing generieren
+    // Generate timestamp for tracing
     uint64_t timestamp = static_cast<uint64_t>(
         std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
@@ -354,10 +354,10 @@ void OnOmniData(float ringAngle, int gamePadX, int gamePadY)
     {
         std::lock_guard<std::mutex> lock(g_state.mtx);
         
-        // X bleibt gleich (links/rechts)
+        // X remains the same (left/right)
         float raw_x = std::clamp((static_cast<float>(gamePadX) - 127.0f) / 127.0f, -1.0f, 1.0f);
         
-        // Y invertiert (vorwärts/rückwärts)
+        // Y inverted (forward/backward)
         float raw_y = std::clamp(-(static_cast<float>(gamePadY) - 127.0f) / 127.0f, -1.0f, 1.0f);
         
         // Store raw values
@@ -390,7 +390,7 @@ void OnOmniData(float ringAngle, int gamePadX, int gamePadY)
         g_state.logCounter++;
     }
     
-    // Einheitliches Logging alle 50 Frames
+    // Unified logging every 50 frames
     if (g_state.logCounter % 50 == 0) {
         Log("treadmill: [OnOmniData #%llu] RAW: angle=%.2f° X=%d Y=%d | SMOOTHED: angle=%.2f° X=%.3f Y=%.3f",
             g_state.logCounter, ringAngle, gamePadX, gamePadY,
@@ -398,7 +398,8 @@ void OnOmniData(float ringAngle, int gamePadX, int gamePadY)
     }
 }
 
-// NEU: Implementierung des Visualisierungs-Trackers
+
+// NEW: Implementation of visualization tracker
 vr::EVRInitError TreadmillVisualTracker::Activate(vr::TrackedDeviceIndex_t unObjectId) {
     m_unObjectId = unObjectId;
     Log("treadmill: VisualTracker Activate called, objectId=%d", static_cast<int>(unObjectId));
@@ -410,17 +411,17 @@ vr::EVRInitError TreadmillVisualTracker::Activate(vr::TrackedDeviceIndex_t unObj
 
     auto container = vr::VRProperties()->TrackedDeviceToPropertyContainer(m_unObjectId);
 
-    // Als GenericTracker registrieren (sichtbar!)
+    // Register as GenericTracker (visible!)
     vr::VRProperties()->SetInt32Property(container, vr::Prop_DeviceClass_Int32, vr::TrackedDeviceClass_GenericTracker);
     
-    // Basis-Properties
+    // Base properties
     vr::VRProperties()->SetStringProperty(container, vr::Prop_TrackingSystemName_String, "treadmill");
     vr::VRProperties()->SetStringProperty(container, vr::Prop_ModelNumber_String, "Treadmill_Orientation_Tracker");
     vr::VRProperties()->SetStringProperty(container, vr::Prop_SerialNumber_String, "treadmill_visual_001");
     vr::VRProperties()->SetStringProperty(container, vr::Prop_RenderModelName_String, "{htc}vr_tracker_vive_1_0");
     vr::VRProperties()->SetStringProperty(container, vr::Prop_ManufacturerName_String, "Treadmill");
     
-    // Icon für SteamVR (nutzt Vive Tracker Icons)
+    // Icons for SteamVR (uses Vive Tracker icons)
     vr::VRProperties()->SetStringProperty(container, vr::Prop_NamedIconPathDeviceOff_String, "{htc}/icons/tracker_status_off.png");
     vr::VRProperties()->SetStringProperty(container, vr::Prop_NamedIconPathDeviceSearching_String, "{htc}/icons/tracker_status_searching.gif");
     vr::VRProperties()->SetStringProperty(container, vr::Prop_NamedIconPathDeviceSearchingAlert_String, "{htc}/icons/tracker_status_searching_alert.gif");
@@ -430,13 +431,13 @@ vr::EVRInitError TreadmillVisualTracker::Activate(vr::TrackedDeviceIndex_t unObj
     vr::VRProperties()->SetStringProperty(container, vr::Prop_NamedIconPathDeviceStandby_String, "{htc}/icons/tracker_status_standby.png");
     vr::VRProperties()->SetStringProperty(container, vr::Prop_NamedIconPathDeviceAlertLow_String, "{htc}/icons/tracker_status_ready_low.png");
 
-    // Tracker-spezifische Properties
+    // Tracker-specific properties
     vr::VRProperties()->SetBoolProperty(container, vr::Prop_WillDriftInYaw_Bool, false);
     vr::VRProperties()->SetBoolProperty(container, vr::Prop_DeviceIsWireless_Bool, false);
     vr::VRProperties()->SetBoolProperty(container, vr::Prop_DeviceIsCharging_Bool, false);
     vr::VRProperties()->SetFloatProperty(container, vr::Prop_DeviceBatteryPercentage_Float, 1.0f);
     
-    // Tracking-Properties
+    // Tracking properties
     vr::VRProperties()->SetBoolProperty(container, vr::Prop_Identifiable_Bool, true);
     vr::VRProperties()->SetInt32Property(container, vr::Prop_Axis0Type_Int32, vr::k_eControllerAxis_None);
     vr::VRProperties()->SetInt32Property(container, vr::Prop_Axis1Type_Int32, vr::k_eControllerAxis_None);
@@ -444,10 +445,10 @@ vr::EVRInitError TreadmillVisualTracker::Activate(vr::TrackedDeviceIndex_t unObj
     vr::VRProperties()->SetInt32Property(container, vr::Prop_Axis3Type_Int32, vr::k_eControllerAxis_None);
     vr::VRProperties()->SetInt32Property(container, vr::Prop_Axis4Type_Int32, vr::k_eControllerAxis_None);
     
-    // Controller-Rolle explizit deaktivieren
+    // Explicitly disable controller role
     vr::VRProperties()->SetInt32Property(container, vr::Prop_ControllerRoleHint_Int32, vr::TrackedControllerRole_Invalid);
 
-    // Pose initialisieren
+    // Initialize pose
     m_pose = {};
     m_pose.poseTimeOffset = 0.0;
     m_pose.poseIsValid = true;
@@ -455,15 +456,11 @@ vr::EVRInitError TreadmillVisualTracker::Activate(vr::TrackedDeviceIndex_t unObj
     m_pose.result = vr::TrackingResult_Running_OK;
     m_pose.qRotation = { 1.0, 0.0, 0.0, 0.0 };
     
-    // Position: Vor dem Spieler auf Brusthöhe
+    // Position: in front of player at chest height
     m_pose.vecPosition[0] = 0.0;
     m_pose.vecPosition[1] = 1.2;
     m_pose.vecPosition[2] = -0.5;
     
-    m_pose.vecVelocity[0] = m_pose.vecVelocity[1] = m_pose.vecVelocity[2] = 0.0;
-    m_pose.vecAcceleration[0] = m_pose.vecAcceleration[1] = m_pose.vecAcceleration[2] = 0.0;
-    m_pose.qWorldFromDriverRotation = { 1,0,0,0 };
-    m_pose.qDriverFromHeadRotation = { 1,0,0,0 };
 
     Log("treadmill: VisualTracker activated successfully");
     return vr::VRInitError_None;
@@ -504,7 +501,7 @@ vr::DriverPose_t TreadmillVisualTracker::GetPose() {
         m_pose.deviceIsConnected = true;
         m_pose.result = vr::TrackingResult_Running_OK;
 
-        // Tracker positioniert sich relativ zum HMD
+        // Tracker positions itself relative to HMD
         vr::TrackedDevicePose_t hmdPose;
         vr::VRServerDriverHost()->GetRawTrackedDevicePoses(0.0f, &hmdPose, 1);
         
@@ -519,37 +516,37 @@ vr::DriverPose_t TreadmillVisualTracker::GetPose() {
             currentHmdZ = hmdMatrix.m[2][3];
             hmdValid = true;
             
-            // Position: Folgt HMD-Position, aber NICHT der HMD-Rotation
-            m_pose.vecPosition[0] = currentHmdX;                  // X-Position vom HMD
-            m_pose.vecPosition[1] = hmdMatrix.m[1][3] - 0.3;     // Y-Position vom HMD, 0.3m tiefer (Brusthöhe)
-            m_pose.vecPosition[2] = currentHmdZ - 0.5;            // Z-Position vom HMD, 0.5m nach vorne
+            // Position: Follows HMD position, but NOT HMD rotation
+            m_pose.vecPosition[0] = currentHmdX;                  // X position from HMD
+            m_pose.vecPosition[1] = hmdMatrix.m[1][3] - 0.3;     // Y position from HMD, 0.3m lower (chest height)
+            m_pose.vecPosition[2] = currentHmdZ - 0.5;            // Z position from HMD, 0.5m forward
         } else {
-            // Fallback wenn HMD-Pose ungültig
+            // Fallback if HMD pose is invalid
             m_pose.vecPosition[0] = 0.0;
             m_pose.vecPosition[1] = 1.2;
             m_pose.vecPosition[2] = -0.5;
         }
 
-        // BEWEGUNGS-ANALYSE: Tatsächliche vs. Erwartete Richtung
+        // MOVEMENT ANALYSIS: Actual vs Expected direction
         if (hmdValid && g_state.hmdInitialized && (logCounter % 50 == 0)) {
-            // Berechne tatsächliche Bewegung (in Weltkoordinaten)
+            // Calculate actual movement (in world coordinates)
             float actualDeltaX = currentHmdX - g_state.lastHmdX;
             float actualDeltaZ = currentHmdZ - g_state.lastHmdZ;
             float actualDistance = std::sqrt(actualDeltaX * actualDeltaX + actualDeltaZ * actualDeltaZ);
             
-            // Nur analysieren, wenn signifikante Bewegung vorliegt (>5cm)
+            // Only analyze if significant movement exists (>5cm)
             if (actualDistance > 0.05f) {
-                // Normalisierte tatsächliche Richtung
+                // Normalized actual direction
                 float actualDirX = actualDeltaX / actualDistance;
                 float actualDirZ = actualDeltaZ / actualDistance;
                 
-                // Berechne erwartete Richtung basierend auf Treadmill-Rotation und Joystick
+                // Calculate expected direction based on treadmill rotation and joystick
                 constexpr double DEG2RAD = 3.14159265358979323846 / 180.0;
                 double yawRad = static_cast<double>(rawYaw) * DEG2RAD;
                 
-                // Rotiere Joystick-Werte in Weltkoordinaten
-                // Joystick: X=seitwärts, Y=vorwärts auf dem Treadmill
-                // Welt: X=rechts, Z=vorwärts (negativ)
+                // Rotate joystick values into world coordinates
+                // Joystick: X=sideways, Y=forward on treadmill
+                // World: X=right, Z=forward (negative)
                 double sinYaw = std::sin(yawRad);
                 double cosYaw = std::cos(yawRad);
                 
@@ -561,12 +558,12 @@ vr::DriverPose_t TreadmillVisualTracker::GetPose() {
                     expectedWorldX /= expectedLength;
                     expectedWorldZ /= expectedLength;
                     
-                    // Berechne Winkel-Abweichung zwischen tatsächlicher und erwarteter Richtung
+                    // Calculate angle deviation between actual and expected direction
                     float dotProduct = actualDirX * expectedWorldX + actualDirZ * expectedWorldZ;
                     dotProduct = std::clamp(dotProduct, -1.0f, 1.0f);
                     float angleDiff = std::acos(dotProduct) * 180.0f / 3.14159265358979323846f;
                     
-                    // WARNUNG bei großer Abweichung (>5°)
+                    // WARNING on large deviation (>5°)
                     if (angleDiff > 5.0f) {
                         Log("treadmill: [DIRECTION MISMATCH!] Angle Deviation: %.1f° | Actual: X=%.3f Z=%.3f | Expected: X=%.3f Z=%.3f | Treadmill Yaw=%.1f° | Joystick X=%.2f Y=%.2f",
                             angleDiff,
@@ -581,18 +578,18 @@ vr::DriverPose_t TreadmillVisualTracker::GetPose() {
             }
         }
         
-        // Speichere aktuelle Position für nächsten Frame
+        // Store current position for next frame
         if (hmdValid) {
             g_state.lastHmdX = currentHmdX;
             g_state.lastHmdZ = currentHmdZ;
             g_state.hmdInitialized = true;
         }
 
-        // Rotation des Trackers basierend NUR auf Treadmill Yaw (NICHT HMD-Rotation!)
+        // Tracker rotation based ONLY on treadmill yaw (NOT HMD rotation!)
         constexpr double DEG2RAD = 3.14159265358979323846 / 180.0;
         double theta = static_cast<double>(rawYaw) * DEG2RAD;
         
-        // Quaternion berechnen
+        // Calculate quaternion
         double half = theta * 0.5;
         double c = std::cos(half);
         double s = std::sin(half);
@@ -602,7 +599,7 @@ vr::DriverPose_t TreadmillVisualTracker::GetPose() {
         m_pose.qRotation.y = -s;
         m_pose.qRotation.z = 0.0;
         
-        // Quaternion normalisieren
+        // Normalize quaternion
         double qLength = std::sqrt(
             m_pose.qRotation.w * m_pose.qRotation.w +
             m_pose.qRotation.x * m_pose.qRotation.x +
@@ -618,7 +615,7 @@ vr::DriverPose_t TreadmillVisualTracker::GetPose() {
         }
     }
 
-    // Einheitliches Logging alle 50 Frames
+    // Unified logging every 50 frames
     if (logCounter % 50 == 0) {
         double expectedWorldX = std::sin(rawYaw * 3.14159265358979323846 / 180.0);
         double expectedWorldZ = -std::cos(rawYaw * 3.14159265358979323846 / 180.0);

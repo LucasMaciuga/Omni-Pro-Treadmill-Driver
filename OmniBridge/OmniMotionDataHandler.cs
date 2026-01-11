@@ -3,7 +3,7 @@ using OmniCommon;
 using OmniCommon.Messages;
 
 /// <summary>
-/// Verwaltet die Konfiguration und den Empfang von OmniMotionDataMessage
+/// Manages the configuration and reception of OmniMotionDataMessage
 /// </summary>
 public class OmniMotionDataHandler : IDisposable
 {
@@ -16,27 +16,27 @@ public class OmniMotionDataHandler : IDisposable
     private int _crcErrorCount = 0;
 
     /// <summary>
-    /// Event wird ausgelöst, wenn Motion Data empfangen wurde
+    /// Event is raised when motion data is received
     /// </summary>
     public event EventHandler<OmniMotionData>? MotionDataReceived;
 
     /// <summary>
-    /// Event wird ausgelöst, wenn Raw Hex Daten empfangen wurden
+    /// Event is raised when raw hex data is received
     /// </summary>
     public event EventHandler<RawHexDataEventArgs>? RawHexDataReceived;
 
     /// <summary>
-    /// Event wird ausgelöst, wenn ein Verbindungsfehler auftritt
+    /// Event is raised when a connection error occurs
     /// </summary>
     public event EventHandler<string>? ConnectionError;
 
     /// <summary>
-    /// Event wird ausgelöst, wenn der OmniMode geändert wurde
+    /// Event is raised when the OmniMode is changed
     /// </summary>
     public event EventHandler<OmniMode>? ModeChanged;
 
     /// <summary>
-    /// Event wird ausgelöst, wenn ein CRC-Fehler auftritt
+    /// Event is raised when a CRC error occurs
     /// </summary>
     public event EventHandler? CrcErrorOccurred;
 
@@ -46,7 +46,7 @@ public class OmniMotionDataHandler : IDisposable
     public OmniMode CurrentMode => _currentMode;
     
     /// <summary>
-    /// Gibt die Anzahl der aufgetretenen CRC-Fehler zurück
+    /// Returns the number of CRC errors that have occurred
     /// </summary>
     public int CrcErrorCount => _crcErrorCount;
 
@@ -71,81 +71,81 @@ public class OmniMotionDataHandler : IDisposable
     }
 
     /// <summary>
-    /// Verbindet mit dem Omni Treadmill und konfiguriert Motion Data Streaming
+    /// Connects to the Omni Treadmill and configures Motion Data streaming
     /// </summary>
-    /// <param name="selection">Die Motion Data Selection - null für AllOn()</param>
-    /// <param name="omniMode">Der OmniMode - null für Standard</param>
+    /// <param name="selection">The Motion Data Selection - null for AllOn()</param>
+    /// <param name="omniMode">The OmniMode - null for standard</param>
     public bool Connect(MotionDataSelection? selection = null, OmniMode? omniMode = null)
     {
         try
         {
             if (_port.IsOpen)
             {
-                Console.WriteLine("Port ist bereits geöffnet.");
+                Console.WriteLine("Port is already open.");
                 return true;
             }
 
-            // Prüfe ob Port existiert
+            // Check if port exists
             if (!ComPortHelper.IsPortAvailable(PortName))
             {
-                var error = $"COM-Port '{PortName}' existiert nicht auf diesem System!";
+                var error = $"COM port '{PortName}' does not exist on this system!";
                 Console.WriteLine(error);
                 ConnectionError?.Invoke(this, error);
                 return false;
             }
 
-            // Prüfe ob Port zugänglich ist
+            // Check if port is accessible
             if (!ComPortHelper.CanAccessPort(PortName, BaudRate))
             {
-                var error = $"COM-Port '{PortName}' ist nicht zugänglich (möglicherweise von einem anderen Programm verwendet)!";
+                var error = $"COM port '{PortName}' is not accessible (possibly used by another program)!";
                 Console.WriteLine(error);
                 ConnectionError?.Invoke(this, error);
                 return false;
             }
 
             _port.Open();
-            Console.WriteLine($"Verbunden mit {_port.PortName} @ {_port.BaudRate} baud");
+            Console.WriteLine($"Connected to {_port.PortName} @ {_port.BaudRate} baud");
 
-            // Setze OmniMode (verwende Settings-Mode oder behalte aktuellen bei)
+            // Set OmniMode (use settings mode or keep current)
             var modeToSet = omniMode ?? _currentMode;
             SetMode(modeToSet);
 
-            Thread.Sleep(_configurationDelayMs); // Warte auf Hardware-Reaktion
+            Thread.Sleep(_configurationDelayMs); // Wait for hardware response
 
-            // Konfiguriere Motion Data (Standard: Alles aktivieren)
+            // Configure Motion Data (default: enable all)
             var motionSelection = selection ?? MotionDataSelection.AllOn();
             ConfigureMotionData(motionSelection);
 
-            Thread.Sleep(_configurationDelayMs); // Warte auf Hardware-Reaktion
+            Thread.Sleep(_configurationDelayMs); // Wait for hardware response
 
-            // Starte Reader-Thread
+            // Start reader thread
             _isRunning = true;
             _readerThread.Start();
 
-            Console.WriteLine("Motion Data Streaming aktiviert.");
+            Console.WriteLine("Motion Data streaming enabled.");
             return true;
         }
         catch (UnauthorizedAccessException ex)
         {
-            var error = $"Zugriff verweigert auf {PortName}: {ex.Message}";
+            var error = $"Access denied to {PortName}: {ex.Message}";
             Console.WriteLine(error);
-            Console.WriteLine("Mögliche Ursachen:");
-            Console.WriteLine("  - Port wird von einem anderen Programm verwendet");
-            Console.WriteLine("  - Unzureichende Berechtigungen");
-            Console.WriteLine("  - USB-Gerät nicht richtig angeschlossen");
+            Console.WriteLine("Possible causes:");
+            Console.WriteLine("  - Port is used by another program");
+            Console.WriteLine("  - Insufficient permissions");
+            Console.WriteLine("  - USB device not properly connected");
             ConnectionError?.Invoke(this, error);
             return false;
         }
         catch (IOException ex)
         {
-            var error = $"I/O-Fehler beim Öffnen von {PortName}: {ex.Message}";
+            var error = $"I/O error when opening {PortName}: {ex.Message}";
             Console.WriteLine(error);
             ConnectionError?.Invoke(this, error);
             return false;
         }
         catch (Exception ex)
         {
-            var error = $"Verbindungsfehler: {ex.Message}";
+            var error = $"Connection error: {ex.Message}";
             Console.WriteLine(error);
             ConnectionError?.Invoke(this, error);
             return false;
@@ -153,13 +153,13 @@ public class OmniMotionDataHandler : IDisposable
     }
 
     /// <summary>
-    /// Setzt den OmniMode (Bewegungsmodus)
+    /// Sets the OmniMode (movement mode)
     /// </summary>
     public void SetMode(OmniMode mode)
     {
         if (!_port.IsOpen)
         {
-            throw new InvalidOperationException("Port ist nicht geöffnet!");
+            throw new InvalidOperationException("Port is not open!");
         }
 
         var previousMode = _currentMode;
@@ -168,25 +168,25 @@ public class OmniMotionDataHandler : IDisposable
         var message = new OmniChangeGamepadModeMessage((byte)mode);
         SendMessage(message);
 
-        Console.WriteLine($"OmniMode gesetzt: {mode} ({(int)mode})");
+        Console.WriteLine($"OmniMode set: {mode} ({(int)mode})");
 
         ModeChanged?.Invoke(this, mode);
     }
 
     /// <summary>
-    /// Konfiguriert welche Motion-Daten gestreamt werden sollen
+    /// Configures which motion data should be streamed
     /// </summary>
     public void ConfigureMotionData(MotionDataSelection selection)
     {
         if (!_port.IsOpen)
         {
-            throw new InvalidOperationException("Port ist nicht geöffnet!");
+            throw new InvalidOperationException("Port is not open!");
         }
 
         var message = new OmniSetMotionDataMessage(selection);
         SendMessage(message);
 
-        Console.WriteLine("Motion Data Konfiguration gesendet:");
+        Console.WriteLine("Motion Data configuration sent:");
         Console.WriteLine($"  - Timestamp: {selection.Timestamp}");
         Console.WriteLine($"  - StepCount: {selection.StepCount}");
         Console.WriteLine($"  - RingAngle: {selection.RingAngle}");
@@ -197,7 +197,7 @@ public class OmniMotionDataHandler : IDisposable
     }
 
     /// <summary>
-    /// Erstellt eine Custom Motion Data Selection
+    /// Creates a custom Motion Data Selection
     /// </summary>
     public static MotionDataSelection CreateCustomSelection(
         bool timestamp = true,
@@ -221,7 +221,7 @@ public class OmniMotionDataHandler : IDisposable
     }
 
     /// <summary>
-    /// Trennt die Verbindung zum Treadmill
+    /// Disconnects from the treadmill
     /// </summary>
     public void Disconnect()
     {
@@ -231,13 +231,13 @@ public class OmniMotionDataHandler : IDisposable
         {
             if (!_readerThread.Join(1000))
             {
-                Console.WriteLine("Warnung: Reader-Thread konnte nicht sauber beendet werden.");
+                Console.WriteLine("Warning: Reader thread could not be terminated cleanly.");
             }
         }
 
         if (_port.IsOpen)
         {
-            // Deaktiviere Motion Data Streaming vor dem Schließen
+            // Disable motion data streaming before closing
             try
             {
                 var offSelection = MotionDataSelection.AllOff();
@@ -247,11 +247,11 @@ public class OmniMotionDataHandler : IDisposable
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Fehler beim Deaktivieren des Streamings: {ex.Message}");
+                Console.WriteLine($"Error disabling streaming: {ex.Message}");
             }
 
             _port.Close();
-            Console.WriteLine("Verbindung getrennt.");
+            Console.WriteLine("Disconnected.");
         }
     }
 
@@ -284,7 +284,7 @@ public class OmniMotionDataHandler : IDisposable
                     // Fire Raw Hex Event
                     OnRawHexDataReceived(buffer, bytesRead);
 
-                    // Dekodiere Packet
+                    // Decode packet
                     OmniBaseMessage? msg = OmniPacketBuilder.decodePacket(buffer, bytesRead);
 
                     if (msg != null)
@@ -293,21 +293,21 @@ public class OmniMotionDataHandler : IDisposable
                     }
                     else
                     {
-                        // CRC-Fehler: Zählen statt ausgeben
+                        // CRC error: count instead of output
                         _crcErrorCount++;
                         CrcErrorOccurred?.Invoke(this, EventArgs.Empty);
                     }
                 }
 
-                Thread.Sleep(10); // CPU schonen
+                Thread.Sleep(10); // Reduce CPU usage
             }
             catch (TimeoutException)
             {
-                // Normal bei ReadTimeout
+                // Normal on ReadTimeout
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Lesefehler: {ex.Message}");
+                Console.WriteLine($"Read error: {ex.Message}");
                 Thread.Sleep(100);
             }
         }
@@ -317,7 +317,7 @@ public class OmniMotionDataHandler : IDisposable
     {
         if (msg.ErrorCode != 0)
         {
-            Console.WriteLine($"Hardware-Fehler Code: {msg.ErrorCode}");
+            Console.WriteLine($"Hardware error code: {msg.ErrorCode}");
         }
 
         if (msg.MsgType == MessageType.OmniMotionDataMessage)
@@ -328,7 +328,7 @@ public class OmniMotionDataHandler : IDisposable
         }
         else
         {
-            Console.WriteLine($"Unerwarteter Message-Typ empfangen: {msg.MsgType}");
+            Console.WriteLine($"Unexpected message type received: {msg.MsgType}");
         }
     }
 
@@ -350,7 +350,7 @@ public class OmniMotionDataHandler : IDisposable
 }
 
 /// <summary>
-/// Event-Argumente für Raw Hex Daten
+/// Event arguments for raw hex data
 /// </summary>
 public class RawHexDataEventArgs : EventArgs
 {
@@ -367,7 +367,7 @@ public class RawHexDataEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Konvertiert die Daten zu einem Hex-String
+    /// Converts the data to a hex string
     /// </summary>
     public string ToHexString()
     {
@@ -375,7 +375,7 @@ public class RawHexDataEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Konvertiert die Daten zu einem formatierten Hex-String mit Offsets
+    /// Converts the data to a formatted hex string with offsets
     /// </summary>
     public string ToFormattedHexString()
     {
@@ -394,12 +394,12 @@ public class RawHexDataEventArgs : EventArgs
 }
 
 /// <summary>
-/// Extension-Methods für OmniMotionData zur besseren Datenausgabe
+/// Extension methods for OmniMotionData for better data output
 /// </summary>
 public static class OmniMotionDataExtensions
 {
     /// <summary>
-    /// Erstellt eine formatierte String-Darstellung der Motion Data
+    /// Creates a formatted string representation of the motion data
     /// </summary>
     public static string ToFormattedString(this OmniMotionData data)
     {
@@ -430,7 +430,7 @@ public static class OmniMotionDataExtensions
     }
 
     /// <summary>
-    /// Erstellt eine kompakte einzeilige String-Darstellung
+    /// Creates a compact single-line string representation
     /// </summary>
     public static string ToCompactString(this OmniMotionData data)
     {

@@ -4,12 +4,12 @@ using System.Runtime.Versioning;
 
 
 /// <summary>
-/// Hilfsmethoden für COM-Port-Verwaltung
+/// Helper methods for COM port management
 /// </summary>
 public static class ComPortHelper
 {
     /// <summary>
-    /// Listet alle verfügbaren COM-Ports auf
+    /// Lists all available COM ports
     /// </summary>
     public static string[] GetAvailablePorts()
     {
@@ -17,7 +17,7 @@ public static class ComPortHelper
     }
 
     /// <summary>
-    /// Prüft ob ein spezifischer COM-Port verfügbar ist
+    /// Checks if a specific COM port is available
     /// </summary>
     public static bool IsPortAvailable(string portName)
     {
@@ -25,7 +25,7 @@ public static class ComPortHelper
     }
 
     /// <summary>
-    /// Versucht einen Port zu öffnen um zu testen ob er zugänglich ist
+    /// Attempts to open a port to test if it is accessible
     /// </summary>
     public static bool CanAccessPort(string portName, int baudRate = 115200)
     {
@@ -43,7 +43,7 @@ public static class ComPortHelper
     }
 
     /// <summary>
-    /// Zeigt alle verfügbaren COM-Ports in der Console an
+    /// Displays all available COM ports in the console
     /// </summary>
     public static void DisplayAvailablePorts()
     {
@@ -51,16 +51,16 @@ public static class ComPortHelper
         
         if (ports.Length == 0)
         {
-            Console.WriteLine("Keine COM-Ports gefunden!");
+            Console.WriteLine("No COM ports found!");
             return;
         }
 
-        Console.WriteLine("Verfügbare COM-Ports:");
+        Console.WriteLine("Available COM ports:");
         Console.WriteLine("=====================");
         
         foreach (var port in ports)
         {
-            var accessible = CanAccessPort(port) ? "✓ Zugreifbar" : "✗ Blockiert";
+            var accessible = CanAccessPort(port) ? "✓ Accessible" : "✗ Blocked";
             var description = GetPortDescription(port);
             
             Console.WriteLine($"  {port,-8} {accessible,-15} {description}");
@@ -70,7 +70,7 @@ public static class ComPortHelper
     }
 
     /// <summary>
-    /// Lässt den Benutzer interaktiv einen COM-Port auswählen
+    /// Lets the user interactively select a COM port
     /// </summary>
     public static string? SelectPortInteractive()
     {
@@ -78,11 +78,11 @@ public static class ComPortHelper
         
         if (ports.Length == 0)
         {
-            Console.WriteLine("Keine COM-Ports gefunden!");
+            Console.WriteLine("No COM ports found!");
             return null;
         }
 
-        Console.WriteLine("Verfügbare COM-Ports:");
+        Console.WriteLine("Available COM ports:");
         for (int i = 0; i < ports.Length; i++)
         {
             var accessible = CanAccessPort(ports[i]) ? "✓" : "✗";
@@ -91,7 +91,7 @@ public static class ComPortHelper
         }
 
         Console.WriteLine();
-        Console.Write("Wählen Sie einen Port (1-{0}) oder [Enter] für Standard: ", ports.Length);
+        Console.Write("Select a port (1-{0}) or press [Enter] for default: ", ports.Length);
         
         var input = Console.ReadLine();
         
@@ -105,12 +105,12 @@ public static class ComPortHelper
             return ports[selection - 1];
         }
 
-        Console.WriteLine("Ungültige Auswahl!");
+        Console.WriteLine("Invalid selection!");
         return null;
     }
 
     /// <summary>
-    /// Versucht eine Beschreibung für den COM-Port zu ermitteln (nur Windows)
+    /// Attempts to retrieve a description for the COM port (Windows only)
     /// </summary>
     [SupportedOSPlatform("windows")]
     private static string GetPortDescriptionWindows(string portName)
@@ -131,10 +131,10 @@ public static class ComPortHelper
         }
         catch
         {
-            // Fehler ignorieren
+            // Ignore errors
         }
 
-        return "Unbekanntes Gerät";
+        return "Unknown device";
     }
 
     private static string GetPortDescription(string portName)
@@ -144,11 +144,11 @@ public static class ComPortHelper
             return GetPortDescriptionWindows(portName);
         }
         
-        return "COM-Port";
+        return "COM port";
     }
 
     /// <summary>
-    /// Findet den ersten verfügbaren und zugänglichen COM-Port
+    /// Finds the first available and accessible COM port
     /// </summary>
     public static string? FindFirstAccessiblePort()
     {

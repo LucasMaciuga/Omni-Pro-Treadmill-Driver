@@ -19,7 +19,7 @@ enum MyComponent
     MyComponent_MAX
 };
 
-// Original Treadmill-Controller (unsichtbar, nur für Inputs)
+// Original Treadmill-Controller (invisible, input-only)
 class TreadmillDevice : public vr::ITrackedDeviceServerDriver {
 private:
     std::atomic<bool> is_active_;
@@ -45,7 +45,7 @@ public:
     void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize) override;
 };
 
-// NEU: Visualisierungs-Tracker (sichtbar in SteamVR)
+// NEW: Visualization tracker (visible in SteamVR)
 class TreadmillVisualTracker : public vr::ITrackedDeviceServerDriver {
 public:
     vr::TrackedDeviceIndex_t m_unObjectId = vr::k_unTrackedDeviceIndexInvalid;  // <-- PUBLIC!

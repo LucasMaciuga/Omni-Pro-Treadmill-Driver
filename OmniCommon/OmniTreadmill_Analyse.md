@@ -1,23 +1,23 @@
-﻿# Omnitreadmill Bibliothek - Vollständige Analyse & Nutzungsanleitung
+﻿# OmniTreadmill Library - Complete Analysis & Usage Guide
 
-## 📋 Übersicht
+## 📋 Overview
 
-Die **OmniCommon**-Bibliothek ist eine .NET Framework 3.5 Bibliothek zur Kommunikation mit dem Virtuix Omni Treadmill. Sie ermöglicht das Auslesen von Sensordaten der Pods (Fußsensoren), Rinkel-Winkel (Ring Angle) und Gamepad-Daten über eine serielle Schnittstelle.
+The **OmniCommon** library is a .NET 10 library for communication with the Virtuix Omni Treadmill. It enables reading sensor data from the Pods (foot sensors), ring angle (Ring Angle), and gamepad data via a serial interface.
 
 ---
 
-## 🏗️ Architektur
+## 🏗️ Architecture
 
-### Kernkomponenten
+### Core Components
 
 ```
 graph TB
-    A[Ihre Anwendung] --> B[OmniBaseMessage]
+    A[Your Application] --> B[OmniBaseMessage]
     B --> C[OmniPacketBuilder]
-    C --> D[Serielle Schnittstelle]
+    C --> D[Serial Interface]
     D --> E[Omni Treadmill Hardware]
     
-    B --> F[Message-Typen]
+    B --> F[Message Types]
     F --> G[Motion Data Messages]
     F --> H[Raw Data Messages]
     F --> I[Control Messages]
@@ -34,77 +34,77 @@ graph TB
 
 ---
 
-## 📦 Nachrichtentypen (MessageType)
+## 📦 Message Types (MessageType)
 
-Die Bibliothek arbeitet mit verschiedenen Nachrichtentypen für unterschiedliche Zwecke:
+The library works with different message types for different purposes:
 
-### 1. **Konfigurations-Messages** (Senden an Hardware)
-| MessageType | Verwendung | Command |
-|-------------|-----------|---------|
-| `OmniSetMotionDataMessage` | Konfiguriert welche Motion-Daten gestreamt werden | `SET_MOTION_DATA_MODE` |
-| `OmniSetRawDataMessage` | Konfiguriert welche Raw-Daten (Pod-Sensoren) gestreamt werden | `SET_RAW_DATA_MODE` |
-| `OmniVersionInfoMessage` | Fragt Versions-Informationen ab | `GET_VERSION_INFO` |
-| `OmniGetRSSIMessage` | Fragt Bluetooth-Signalstärke ab | `GET_GAZELL_RSSI` |
-| `OmniSetSensitivityMessage` | Setzt Empfindlichkeit | `SET_SENSITIVITY` |
+### 1. **Configuration Messages** (Send to Hardware)
+| MessageType | Usage | Command |
+|-------------|-------|---------|
+| `OmniSetMotionDataMessage` | Configures which motion data is streamed | `SET_MOTION_DATA_MODE` |
+| `OmniSetRawDataMessage` | Configures which raw data (pod sensors) is streamed | `SET_RAW_DATA_MODE` |
+| `OmniVersionInfoMessage` | Queries version information | `GET_VERSION_INFO` |
+| `OmniGetRSSIMessage` | Queries Bluetooth signal strength | `GET_GAZELL_RSSI` |
+| `OmniSetSensitivityMessage` | Sets sensitivity | `SET_SENSITIVITY` |
 
-### 2. **Datenempfangs-Messages** (Von Hardware empfangen)
-| MessageType | Dateninhalt | Command |
-|-------------|-------------|---------|
-| `OmniMotionDataMessage` | Bewegungsdaten (Winkel, Schritte, Gamepad) | `STREAM_MOTION_DATA` |
-| `OmniRawDataMessage` | Rohdaten der Pod-Sensoren (Quaternions, Accelerometer, Gyroscope) | `STREAM_RAW_DATA` |
-| `OmniMotionAndRawDataMessage` | **Beide kombiniert** (Motion + Raw Data) | `STREAM_MOTION_AND_RAW_DATA` |
-
----
-
-## 🎯 Datentypen
-
-### Motion Data (Bewegungsdaten)
-
-**Verfügbare Felder:**
-```
-- Timestamp        // uint - Zeitstempel
-- StepCount        // uint - Anzahl Schritte
-- RingAngle        // float - Winkel des Rings (Drehung des Benutzers)
-- RingDelta        // byte - Änderung des Winkels
-- GamePad_X        // byte - Gamepad X-Achse
-- GamePad_Y        // byte - Gamepad Y-Achse
-- GunButtonData    // byte - Gun-Button Status
-- StepTrigger      // byte - Schritt-Trigger
-```
-
-### Raw Data (Pod-Sensordaten)
-
-**Pro Pod verfügbar:**
-```
-- Quaternions      // float[4] - Orientierung (W, X, Y, Z)
-- Accelerometer    // float[3] - Beschleunigung (X, Y, Z) in g
-- Gyroscope        // float[3] - Drehrate (X, Y, Z) in °/s
-- FrameNumber      // ushort - Frame-Nummer
-```
-
-**Wichtig:** Das Omni hat **2 Pods** (Pod1 = linker Fuß, Pod2 = rechter Fuß)
+### 2. **Data Reception Messages** (Received from Hardware)
+| MessageType | Data Content | Command |
+|-------------|--------------|---------|
+| `OmniMotionDataMessage` | Motion data (angle, steps, gamepad) | `STREAM_MOTION_DATA` |
+| `OmniRawDataMessage` | Raw pod sensor data (Quaternions, Accelerometer, Gyroscope) | `STREAM_RAW_DATA` |
+| `OmniMotionAndRawDataMessage` | **Both combined** (Motion + Raw Data) | `STREAM_MOTION_AND_RAW_DATA` |
 
 ---
 
-## 🔧 Verwendung - Schritt für Schritt
+## 🎯 Data Types
 
-### Schritt 1: Message erstellen und kodieren
+### Motion Data (Movement Data)
+
+**Available Fields:**
+```
+- Timestamp        // uint - Timestamp
+- StepCount        // uint - Number of steps
+- RingAngle        // float - Angle of the ring (user rotation)
+- RingDelta        // byte - Change of angle
+- GamePad_X        // byte - Gamepad X-axis
+- GamePad_Y        // byte - Gamepad Y-axis
+- GunButtonData    // byte - Gun button status
+- StepTrigger      // byte - Step trigger
+```
+
+### Raw Data (Pod Sensor Data)
+
+**Available per Pod:**
+```
+- Quaternions      // float[4] - Orientation (W, X, Y, Z)
+- Accelerometer    // float[3] - Acceleration (X, Y, Z) in g
+- Gyroscope        // float[3] - Rotation rate (X, Y, Z) in °/s
+- FrameNumber      // ushort - Frame number
+```
+
+**Important:** The Omni has **2 Pods** (Pod1 = left foot, Pod2 = right foot)
+
+---
+
+## 🔧 Usage - Step by Step
+
+### Step 1: Create and encode message
 
 ```
 using OmniCommon;
 using OmniCommon.Messages;
 
-// Beispiel 1: Motion Data konfigurieren (alles aktivieren)
+// Example 1: Configure motion data (enable all)
 MotionDataSelection motionSelection = MotionDataSelection.AllOn();
 OmniSetMotionDataMessage motionConfigMsg = new OmniSetMotionDataMessage(motionSelection);
 byte[] packetToSend = motionConfigMsg.Encode();
 
-// Beispiel 2: Nur spezifische Motion-Daten
+// Example 2: Only specific motion data
 MotionDataSelection customMotion = new MotionDataSelection
 {
     Timestamp = true,
     StepCount = true,
-    RingAngle = true,  // ← Wichtig für den Winkel!
+    RingAngle = true,  // ← Important for angle!
     RingDelta = true,
     GamePadData = false,
     GunButtonData = false,
@@ -114,22 +114,22 @@ OmniSetMotionDataMessage customMsg = new OmniSetMotionDataMessage(customMotion);
 byte[] customPacket = customMsg.Encode();
 ```
 
-### Schritt 2: Raw Data (Pod-Sensoren) konfigurieren
+### Step 2: Configure raw data (pod sensors)
 
 ```
-// Beispiel 1: Alle Pod-Daten aktivieren (2 Pods)
+// Example 1: Enable all pod data (2 Pods)
 RawDataSelection rawSelection = RawDataSelection.AllOn(2);
 OmniSetRawDataMessage rawConfigMsg = new OmniSetRawDataMessage(rawSelection);
 byte[] rawPacket = rawConfigMsg.Encode();
 
-// Beispiel 2: Nur Quaternions und Accelerometer
+// Example 2: Only quaternions and accelerometer
 RawDataSelection customRaw = new RawDataSelection
 {
     Count = 2,  // 2 Pods
     Timestamp = true,
     Pods = new List<RawPodDataMode>
     {
-        // Pod 1 (linker Fuß)
+        // Pod 1 (left foot)
         new RawPodDataMode
         {
             Quaternions = true,
@@ -137,7 +137,7 @@ RawDataSelection customRaw = new RawDataSelection
             Gyroscope = false,
             FrameNumber = false
         },
-        // Pod 2 (rechter Fuß)
+        // Pod 2 (right foot)
         new RawPodDataMode
         {
             Quaternions = true,
@@ -151,39 +151,39 @@ OmniSetRawDataMessage customRawMsg = new OmniSetRawDataMessage(customRaw);
 byte[] customRawPacket = customRawMsg.Encode();
 ```
 
-### Schritt 3: Packet senden (über SerialPort)
+### Step 3: Send packet (via SerialPort)
 
 ```
 using System.IO.Ports;
 
-SerialPort omniPort = new SerialPort("COM3", 115200); // Anpassen!
+SerialPort omniPort = new SerialPort("COM3", 115200); // Adjust!
 omniPort.Open();
 
-// Sende Konfigurations-Packet
+// Send configuration packet
 omniPort.Write(packetToSend, 0, packetToSend.Length);
 
-// Optional: Warte kurz
+// Optional: Wait briefly
 System.Threading.Thread.Sleep(100);
 ```
 
-### Schritt 4: Daten empfangen und dekodieren
+### Step 4: Receive and decode data
 
 ```
-// Buffer für eingehende Daten
+// Buffer for incoming data
 byte[] buffer = new byte[256];
 int bytesRead = 0;
 
-// Empfange Daten
+// Receive data
 if (omniPort.BytesToRead > 0)
 {
     bytesRead = omniPort.Read(buffer, 0, buffer.Length);
     
-    // Dekodiere das Packet
+    // Decode the packet
     OmniBaseMessage receivedMsg = OmniPacketBuilder.decodePacket(buffer, bytesRead);
     
     if (receivedMsg != null)
     {
-        // Prüfe Message-Typ und verarbeite
+        // Check message type and process
         switch (receivedMsg.MsgType)
         {
             case MessageType.OmniMotionDataMessage:
@@ -202,9 +202,9 @@ if (omniPort.BytesToRead > 0)
 }
 ```
 
-### Schritt 5: Daten extrahieren
+### Step 5: Extract data
 
-#### A) Motion Data extrahieren
+#### A) Extract motion data
 
 ```
 void ProcessMotionData(OmniBaseMessage baseMsg)
@@ -214,7 +214,7 @@ void ProcessMotionData(OmniBaseMessage baseMsg)
     
     if (data.EnableRingAngle)
     {
-        float angle = data.RingAngle; // Winkel in Grad (0-360)
+        float angle = data.RingAngle; // Angle in degrees (0-360)
         Console.WriteLine($"Ring Angle: {angle}°");
     }
     
@@ -233,7 +233,7 @@ void ProcessMotionData(OmniBaseMessage baseMsg)
 }
 ```
 
-#### B) Raw Data (Pod-Sensoren) extrahieren
+#### B) Extract raw data (pod sensors)
 
 ```
 void ProcessRawData(OmniBaseMessage baseMsg)
@@ -241,7 +241,7 @@ void ProcessRawData(OmniBaseMessage baseMsg)
     OmniRawDataMessage rawMsg = new OmniRawDataMessage(baseMsg);
     OmniRawData data = rawMsg.GetRawData();
     
-    // Zugriff auf Pod-Daten
+    // Access pod data
     for (int i = 0; i < data.PodData.Count; i++)
     {
         PodRawData pod = data.PodData[i];
@@ -273,7 +273,7 @@ void ProcessRawData(OmniBaseMessage baseMsg)
 }
 ```
 
-#### C) Kombinierte Daten (Motion + Raw)
+#### C) Extract combined data (Motion + Raw)
 
 ```
 void ProcessCombinedData(OmniBaseMessage baseMsg)
@@ -281,12 +281,12 @@ void ProcessCombinedData(OmniBaseMessage baseMsg)
     OmniMotionAndRawDataMessage combinedMsg = new OmniMotionAndRawDataMessage(baseMsg);
     OmniMotionAndRawData data = combinedMsg.GetMotionAndRawData();
     
-    // Motion-Daten
+    // Motion data
     Console.WriteLine($"Timestamp: {data.Timestamp}");
     Console.WriteLine($"Steps: {data.StepCount}");
     Console.WriteLine($"Ring Angle: {data.RingAngle}°");
     
-    // Pod 1 Daten
+    // Pod 1 data
     if (data.Pod1Quaternions != null)
     {
         Console.WriteLine($"Pod1 Quaternions: {string.Join(", ", data.Pod1Quaternions)}");
@@ -297,7 +297,7 @@ void ProcessCombinedData(OmniBaseMessage baseMsg)
         Console.WriteLine($"Pod1 Accel: {string.Join(", ", data.Pod1Accelerometer)}");
     }
     
-    // Pod 2 Daten
+    // Pod 2 data
     if (data.Pod2Quaternions != null)
     {
         Console.WriteLine($"Pod2 Quaternions: {string.Join(", ", data.Pod2Quaternions)}");
@@ -307,22 +307,22 @@ void ProcessCombinedData(OmniBaseMessage baseMsg)
 
 ---
 
-## 🎮 Wichtige Commands
+## 🎮 Important Commands
 
-### Steuerungsbefehle
+### Control Commands
 
 ```
-// Versions-Info abfragen
+// Query version info
 OmniVersionInfoMessage versionMsg = new OmniVersionInfoMessage();
 byte[] versionPacket = versionMsg.Encode();
 omniPort.Write(versionPacket, 0, versionPacket.Length);
 
-// RSSI (Bluetooth-Signalstärke) abfragen
+// Query RSSI (Bluetooth signal strength)
 OmniGetRSSIMessage rssiMsg = new OmniGetRSSIMessage();
 byte[] rssiPacket = rssiMsg.Encode();
 omniPort.Write(rssiPacket, 0, rssiPacket.Length);
 
-// Treadmill zurücksetzen
+// Reset treadmill
 OmniResetTivaMessage resetMsg = new OmniResetTivaMessage();
 byte[] resetPacket = resetMsg.Encode();
 omniPort.Write(resetPacket, 0, resetPacket.Length);
@@ -330,28 +330,28 @@ omniPort.Write(resetPacket, 0, resetPacket.Length);
 
 ---
 
-## 🔍 Packet-Struktur
+## 🔍 Packet Structure
 
 ```
 ┌─────────────────────────────────────────────────┐
-│ Byte 0: 0xEF (Start-Marker)                    │
+│ Byte 0: 0xEF (Start marker)                    │
 ├─────────────────────────────────────────────────┤
-│ Byte 1: Packet Length (Payload + 8)            │
+│ Byte 1: Packet length (Payload + 8)            │
 ├─────────────────────────────────────────────────┤
 │ Byte 2: Command/MessageType                     │
 ├─────────────────────────────────────────────────┤
 │ Byte 3: Packet ID                               │
 ├─────────────────────────────────────────────────┤
-│ Byte 4: Pipe/Status Byte                        │
-│   - Bits 4-7: Pipe Number                       │
-│   - Bits 1-3: Error Code                        │
-│   - Bit 0: IsResponse Flag                      │
+│ Byte 4: Pipe/Status byte                        │
+│   - Bits 4-7: Pipe number                       │
+│   - Bits 1-3: Error code                        │
+│   - Bit 0: IsResponse flag                      │
 ├─────────────────────────────────────────────────┤
-│ Byte 5-N: Payload Data                          │
+│ Byte 5-N: Payload data                          │
 ├─────────────────────────────────────────────────┤
 │ Byte N+1, N+2: CRC16 (Little Endian)           │
 ├─────────────────────────────────────────────────┤
-│ Byte N+3: 0xBE (End-Marker)                    │
+│ Byte N+3: 0xBE (End marker)                    │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -359,37 +359,37 @@ omniPort.Write(resetPacket, 0, resetPacket.Length);
 
 ## 💡 Best Practices
 
-### 1. **Datenumschaltung (Switching)**
+### 1. **Data Mode Switching**
 
 ```
-// Um zwischen Modi zu wechseln, sende neue Konfigurations-Messages
+// To switch between modes, send new configuration messages
 
-// Motion Data aktivieren
+// Enable motion data
 MotionDataSelection motionSel = MotionDataSelection.AllOn();
 SendMessage(new OmniSetMotionDataMessage(motionSel));
 
-// Nach Bedarf: Raw Data aktivieren (kann parallel laufen)
+// As needed: Enable raw data (can run in parallel)
 RawDataSelection rawSel = RawDataSelection.AllOn(2);
 SendMessage(new OmniSetRawDataMessage(rawSel));
 
-// Oder: Alles ausschalten
+// Or: Disable all
 SendMessage(new OmniSetMotionDataMessage(MotionDataSelection.AllOff()));
 SendMessage(new OmniSetRawDataMessage(RawDataSelection.AllOff()));
 ```
 
-### 2. **Effizienter Datenabruf**
+### 2. **Efficient Data Retrieval**
 
 ```
-// Nur benötigte Daten aktivieren für bessere Performance
+// Enable only required data for better performance
 MotionDataSelection efficientMotion = new MotionDataSelection
 {
     Timestamp = true,
-    StepCount = false,  // Nicht benötigt
-    RingAngle = true,   // Benötigt für Richtung
+    StepCount = false,  // Not needed
+    RingAngle = true,   // Needed for direction
     RingDelta = false,
     GamePadData = false,
     GunButtonData = false,
-    StepTrigger = true  // Benötigt für Schritterkennung
+    StepTrigger = true  // Needed for step detection
 };
 ```
 
@@ -400,18 +400,18 @@ OmniBaseMessage msg = OmniPacketBuilder.decodePacket(buffer, bytesRead);
 
 if (msg == null)
 {
-    Console.WriteLine("CRC-Fehler oder ungültiges Packet!");
+    Console.WriteLine("CRC error or invalid packet!");
     return;
 }
 
 if (msg.ErrorCode != 0)
 {
-    Console.WriteLine($"Hardware-Fehler: {msg.ErrorCode}");
+    Console.WriteLine($"Hardware error: {msg.ErrorCode}");
 }
 
 if (msg.IsResponse)
 {
-    Console.WriteLine("Dies ist eine Antwort auf einen vorherigen Command");
+    Console.WriteLine("This is a response to a previous command");
 }
 ```
 
@@ -436,101 +436,101 @@ while (isRunning)
             }
         }
         
-        System.Threading.Thread.Sleep(10); // CPU schonen
+        System.Threading.Thread.Sleep(10); // Reduce CPU usage
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Fehler: {ex.Message}");
+        Console.WriteLine($"Error: {ex.Message}");
     }
 }
 ```
 
 ---
 
-## 📊 Datenkonvertierung
+## 📊 Data Conversion
 
 ### Ring Angle
-- **Wertebereich:** 0.0 bis 360.0 Grad
-- **Typ:** `float`
-- **Bedeutung:** Absolute Richtung des Benutzers
+- **Value range:** 0.0 to 360.0 degrees
+- **Type:** `float`
+- **Meaning:** Absolute direction of the user
 
-### Quaternions (Orientierung)
+### Quaternions (Orientation)
 - **Array:** `float[4]` → `[W, X, Y, Z]`
-- **Normalisiert:** Länge sollte ≈ 1.0 sein
-- **Konvertierung zu Euler-Winkeln möglich**
+- **Normalized:** Length should be ≈ 1.0
+- **Conversion to Euler angles possible**
 
 ### Accelerometer
 - **Array:** `float[3]` → `[X, Y, Z]`
-- **Einheit:** g (Erdbeschleunigung)
-- **Skalierung:** Wert / 4096.0
-- **Bereich:** Typisch ±2g bis ±8g
+- **Unit:** g (gravitational acceleration)
+- **Scaling:** Value / 4096.0
+- **Range:** Typically ±2g to ±8g
 
 ### Gyroscope
 - **Array:** `float[3]` → `[X, Y, Z]`
-- **Einheit:** Grad pro Sekunde (°/s)
-- **Skalierung:** Wert / 1024.0
-- **Bereich:** Typisch ±250°/s bis ±2000°/s
+- **Unit:** Degrees per second (°/s)
+- **Scaling:** Value / 1024.0
+- **Range:** Typically ±250°/s to ±2000°/s
 
 ---
 
-## 🚀 Zusammenfassung
+## 🚀 Summary
 
-### Grundlegender Workflow
+### Basic Workflow
 
 ```
 sequenceDiagram
-    participant App as Ihre App
+    participant App as Your App
     participant Lib as OmniCommon
     participant HW as Omni Hardware
     
-    App->>Lib: Erstelle OmniSetMotionDataMessage
+    App->>Lib: Create OmniSetMotionDataMessage
     Lib->>App: Encode() → byte[]
     App->>HW: SerialPort.Write(bytes)
     
-    Note over HW: Hardware verarbeitet Konfiguration
+    Note over HW: Hardware processes configuration
     
-    HW->>App: Sendet Motion Data Stream
+    HW->>App: Sends motion data stream
     App->>Lib: decodePacket(buffer)
     Lib->>App: OmniBaseMessage
     App->>Lib: GetMotionData()
-    Lib->>App: OmniMotionData mit allen Werten
+    Lib->>App: OmniMotionData with all values
     
-    App->>App: Verarbeite RingAngle, Steps, etc.
+    App->>App: Process RingAngle, steps, etc.
 ```
 
-### Schalter-Übersicht
+### Switch Overview
 
-| Was Sie tun möchten | Welche Message | Wichtige Properties |
-|---------------------|---------------|---------------------|
-| Winkel-Daten erhalten | `OmniSetMotionDataMessage` | `RingAngle = true` |
-| Pod-Quaternions erhalten | `OmniSetRawDataMessage` | `Pods[i].Quaternions = true` |
-| Beschleunigungsdaten | `OmniSetRawDataMessage` | `Pods[i].Accelerometer = true` |
-| Gyroskop-Daten | `OmniSetRawDataMessage` | `Pods[i].Gyroscope = true` |
-| Schrittzähler | `OmniSetMotionDataMessage` | `StepCount = true` |
-| Gamepad-Daten | `OmniSetMotionDataMessage` | `GamePadData = true` |
-| Alles auf einmal | `OmniMotionAndRawDataMessage` | Kombiniert beide Modi |
-
----
-
-## ⚠️ Wichtige Hinweise
-
-1. **Thread-Safety:** Die Bibliothek ist NICHT thread-safe. Verwenden Sie Locks bei Multi-Threading!
-
-2. **COM-Port:** Der korrekte COM-Port muss ermittelt werden (z.B. "COM3", "COM4", etc.)
-
-3. **Baudrate:** Standardmäßig **115200** für Omni Treadmill
-
-4. **Packet-Größe:** Maximale Payload-Größe beachten (Typ `byte` für Length)
-
-5. **CRC-Prüfung:** Immer prüfen ob `decodePacket()` `null` zurückgibt
-
-6. **Timing:** Nach Konfigurations-Messages kurz warten (100ms) bevor Daten erwartet werden
+| What You Want | Which Message | Important Properties |
+|---------------|---------------|----------------------|
+| Get angle data | `OmniSetMotionDataMessage` | `RingAngle = true` |
+| Get pod quaternions | `OmniSetRawDataMessage` | `Pods[i].Quaternions = true` |
+| Get acceleration data | `OmniSetRawDataMessage` | `Pods[i].Accelerometer = true` |
+| Get gyroscope data | `OmniSetRawDataMessage` | `Pods[i].Gyroscope = true` |
+| Get step counter | `OmniSetMotionDataMessage` | `StepCount = true` |
+| Get gamepad data | `OmniSetMotionDataMessage` | `GamePadData = true` |
+| Get everything at once | `OmniMotionAndRawDataMessage` | Combines both modes |
 
 ---
 
-## 📚 Message-Klassen Referenz
+## ⚠️ Important Notes
 
-### Konfigurations-Klassen
+1. **Thread-Safety:** The library is NOT thread-safe. Use locks for multi-threading!
+
+2. **COM Port:** The correct COM port must be determined (e.g., "COM3", "COM4", etc.)
+
+3. **Baud Rate:** Default **115200** for Omni Treadmill
+
+4. **Packet Size:** Keep maximum payload size in mind (Type `byte` for Length)
+
+5. **CRC Check:** Always check if `decodePacket()` returns `null`
+
+6. **Timing:** Wait briefly after configuration messages (100ms) before expecting data
+
+---
+
+## 📚 Message Classes Reference
+
+### Configuration Classes
 
 #### MotionDataSelection
 ```
@@ -544,7 +544,7 @@ public class MotionDataSelection
     public bool GunButtonData;
     public bool StepTrigger;
     
-    // Factory-Methoden
+    // Factory methods
     public static MotionDataSelection AllOn();
     public static MotionDataSelection AllOff();
     public static MotionDataSelection StreamingWindowData();
@@ -555,11 +555,11 @@ public class MotionDataSelection
 ```
 public class RawDataSelection
 {
-    public int Count;  // Anzahl Pods (normalerweise 2)
+    public int Count;  // Number of pods (usually 2)
     public bool Timestamp;
     public List<RawPodDataMode> Pods;
     
-    // Factory-Methoden
+    // Factory methods
     public static RawDataSelection AllOn(int count);
     public static RawDataSelection AllOff(int count);
     public static RawDataSelection AllOff();
@@ -575,11 +575,11 @@ public class RawPodDataMode
     public bool Gyroscope;
     public bool FrameNumber;
     
-    public byte GetByte();  // Konvertiert zu Byte-Repräsentation
+    public byte GetByte();  // Converts to byte representation
 }
 ```
 
-### Daten-Klassen
+### Data Classes
 
 #### OmniMotionData
 ```
@@ -635,7 +635,7 @@ public class PodRawData
 ```
 public class OmniMotionAndRawData
 {
-    // Motion-Daten
+    // Motion data
     public uint Timestamp;
     public uint StepCount;
     public float RingAngle;
@@ -644,12 +644,12 @@ public class OmniMotionAndRawData
     public byte GamePad_Y;
     public byte StepTrigger;
     
-    // Pod 1 Raw-Daten
+    // Pod 1 raw data
     public float[] Pod1Quaternions;
     public float[] Pod1Accelerometer;
     public float[] Pod1Gyroscope;
     
-    // Pod 2 Raw-Daten
+    // Pod 2 raw data
     public float[] Pod2Quaternions;
     public float[] Pod2Accelerometer;
     public float[] Pod2Gyroscope;
@@ -658,9 +658,9 @@ public class OmniMotionAndRawData
 
 ---
 
-## 🔧 Erweiterte Beispiele
+## 🔧 Advanced Examples
 
-### Beispiel 1: Vollständige Initialisierung
+### Example 1: Complete Initialization
 
 ```
 using System;
@@ -685,17 +685,17 @@ public class OmniTreadmillController
             port = new SerialPort(comPort, 115200);
             port.Open();
             
-            // Konfiguriere Motion Data
+            // Configure motion data
             MotionDataSelection motionSel = MotionDataSelection.AllOn();
             SendMessage(new OmniSetMotionDataMessage(motionSel));
             
             Thread.Sleep(100);
             
-            // Konfiguriere Raw Data für 2 Pods
+            // Configure raw data for 2 pods
             RawDataSelection rawSel = RawDataSelection.AllOn(2);
             SendMessage(new OmniSetRawDataMessage(rawSel));
             
-            // Starte Reader-Thread
+            // Start reader thread
             isRunning = true;
             readerThread = new Thread(ReadLoop);
             readerThread.Start();
@@ -704,7 +704,7 @@ public class OmniTreadmillController
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Verbindungsfehler: {ex.Message}");
+            Console.WriteLine($"Connection error: {ex.Message}");
             return false;
         }
     }
@@ -753,7 +753,7 @@ public class OmniTreadmillController
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Lesefehler: {ex.Message}");
+                Console.WriteLine($"Read error: {ex.Message}");
             }
         }
     }
@@ -777,14 +777,14 @@ public class OmniTreadmillController
             case MessageType.OmniMotionAndRawDataMessage:
                 OmniMotionAndRawDataMessage combinedMsg = new OmniMotionAndRawDataMessage(msg);
                 OmniMotionAndRawData combinedData = combinedMsg.GetMotionAndRawData();
-                // Verarbeite kombinierte Daten
+                // Process combined data
                 break;
         }
     }
 }
 ```
 
-### Beispiel 2: Verwendung des Controllers
+### Example 2: Using the Controller
 
 ```
 class Program
@@ -793,22 +793,22 @@ class Program
     {
         OmniTreadmillController controller = new OmniTreadmillController();
         
-        // Event-Handler registrieren
+        // Register event handlers
         controller.MotionDataReceived += OnMotionDataReceived;
         controller.RawDataReceived += OnRawDataReceived;
         
-        // Verbinden
+        // Connect
         if (controller.Connect("COM3"))
         {
-            Console.WriteLine("Verbunden mit Omni Treadmill");
-            Console.WriteLine("Drücken Sie eine Taste zum Beenden...");
+            Console.WriteLine("Connected to Omni Treadmill");
+            Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
             
             controller.Disconnect();
         }
         else
         {
-            Console.WriteLine("Verbindung fehlgeschlagen!");
+            Console.WriteLine("Connection failed!");
         }
     }
     
@@ -844,7 +844,7 @@ class Program
 }
 ```
 
-### Beispiel 3: Quaternion zu Euler-Winkel Konvertierung
+### Example 3: Quaternion to Euler Angle Conversion
 
 ```
 public class QuaternionHelper
@@ -857,31 +857,31 @@ public class QuaternionHelper
         float y = q[2];
         float z = q[3];
         
-        // Roll (X-Achse)
+        // Roll (X-axis)
         float sinr_cosp = 2.0f * (w * x + y * z);
         float cosr_cosp = 1.0f - 2.0f * (x * x + y * y);
         roll = (float)Math.Atan2(sinr_cosp, cosr_cosp);
         
-        // Pitch (Y-Achse)
+        // Pitch (Y-axis)
         float sinp = 2.0f * (w * y - z * x);
         if (Math.Abs(sinp) >= 1)
             pitch = (float)Math.CopySign(Math.PI / 2, sinp); // ±90°
         else
             pitch = (float)Math.Asin(sinp);
         
-        // Yaw (Z-Achse)
+        // Yaw (Z-axis)
         float siny_cosp = 2.0f * (w * z + x * y);
         float cosy_cosp = 1.0f - 2.0f * (y * y + z * z);
         yaw = (float)Math.Atan2(siny_cosp, cosy_cosp);
         
-        // Konvertiere zu Grad
+        // Convert to degrees
         roll = roll * 180.0f / (float)Math.PI;
         pitch = pitch * 180.0f / (float)Math.PI;
         yaw = yaw * 180.0f / (float)Math.PI;
     }
 }
 
-// Verwendung
+// Usage
 float[] quaternions = podData.Quaternions;
 float roll, pitch, yaw;
 QuaternionHelper.QuaternionToEuler(quaternions, out roll, out pitch, out yaw);
@@ -892,37 +892,37 @@ Console.WriteLine($"Roll: {roll:F2}°, Pitch: {pitch:F2}°, Yaw: {yaw:F2}°");
 
 ## 🐛 Troubleshooting
 
-### Problem: Keine Daten empfangen
+### Problem: No Data Received
 
-**Lösung:**
+**Solution:**
 ```
-// 1. Prüfen Sie die Verbindung
+// 1. Check the connection
 if (!port.IsOpen)
 {
-    Console.WriteLine("Port ist nicht geöffnet!");
+    Console.WriteLine("Port is not open!");
 }
 
-// 2. Prüfen Sie ob Konfigurations-Messages gesendet wurden
+// 2. Check if configuration messages were sent
 MotionDataSelection selection = MotionDataSelection.AllOn();
 OmniSetMotionDataMessage msg = new OmniSetMotionDataMessage(selection);
 byte[] packet = msg.Encode();
 port.Write(packet, 0, packet.Length);
-Thread.Sleep(200); // Warten Sie länger
+Thread.Sleep(200); // Wait longer
 
-// 3. Prüfen Sie die Baudrate
-// Omni verwendet 115200
+// 3. Check the baud rate
+// Omni uses 115200
 ```
 
-### Problem: CRC-Fehler
+### Problem: CRC Error
 
-**Lösung:**
+**Solution:**
 ```
-// Stellen Sie sicher, dass Sie die vollständige Message lesen
+// Make sure you read the complete message
 byte[] buffer = new byte[256];
 int bytesRead = 0;
 
-// Warten bis genug Daten verfügbar sind
-while (port.BytesToRead < 8) // Minimum-Packet-Größe
+// Wait until enough data is available
+while (port.BytesToRead < 8) // Minimum packet size
 {
     Thread.Sleep(10);
 }
@@ -932,17 +932,17 @@ bytesRead = port.Read(buffer, 0, Math.Min(port.BytesToRead, buffer.Length));
 OmniBaseMessage msg = OmniPacketBuilder.decodePacket(buffer, bytesRead);
 if (msg == null)
 {
-    Console.WriteLine("CRC-Fehler oder unvollständige Daten");
-    // Buffer leeren
+    Console.WriteLine("CRC error or incomplete data");
+    // Flush buffer
     port.DiscardInBuffer();
 }
 ```
 
-### Problem: Threading-Probleme
+### Problem: Threading Issues
 
-**Lösung:**
+**Solution:**
 ```
-// Verwenden Sie Locks für Thread-Safety
+// Use locks for thread-safety
 private object lockObject = new object();
 
 private void SendMessage(OmniBaseMessage message)
@@ -962,7 +962,7 @@ private void ReadLoop()
         {
             if (port.BytesToRead > 0)
             {
-                // Lese Daten...
+                // Read data...
             }
         }
         Thread.Sleep(10);
@@ -972,18 +972,18 @@ private void ReadLoop()
 
 ---
 
-## 📖 Glossar
+## 📖 Glossary
 
-| Begriff | Bedeutung |
-|---------|-----------|
-| **Pod** | Fußsensor des Omni Treadmill (links/rechts) |
-| **Ring Angle** | Drehwinkel des Benutzers auf dem Treadmill (0-360°) |
-| **Quaternion** | 4D-Repräsentation der Orientierung (W, X, Y, Z) |
-| **Accelerometer** | Beschleunigungssensor (misst lineare Beschleunigung) |
-| **Gyroscope** | Drehratensensor (misst Winkelgeschwindigkeit) |
-| **CRC16** | Cyclic Redundancy Check - Prüfsumme zur Fehlererkennung |
-| **Payload** | Nutzdaten innerhalb eines Packets |
-| **Pipe** | Kommunikationskanal (Bits 4-7 des Status-Bytes) |
-| **RSSI** | Received Signal Strength Indicator - Signalstärke |
+| Term | Meaning |
+|------|---------|
+| **Pod** | Foot sensor of Omni Treadmill (left/right) |
+| **Ring Angle** | Rotation angle of user on treadmill (0-360°) |
+| **Quaternion** | 4D representation of orientation (W, X, Y, Z) |
+| **Accelerometer** | Acceleration sensor (measures linear acceleration) |
+| **Gyroscope** | Rotation rate sensor (measures angular velocity) |
+| **CRC16** | Cyclic Redundancy Check - error detection checksum |
+| **Payload** | Useful data within a packet |
+| **Pipe** | Communication channel (Bits 4-7 of status byte) |
+| **RSSI** | Received Signal Strength Indicator - signal strength |
 
 ---
