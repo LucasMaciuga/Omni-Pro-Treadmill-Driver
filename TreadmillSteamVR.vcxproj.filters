@@ -22,14 +22,17 @@
     <Filter Include="Ressourcendateien\resources\settings">
       <UniqueIdentifier>{3da02f1b-c69e-48f0-b99d-d6f4f4365765}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Ressourcendateien\bin">
-      <UniqueIdentifier>{f6f51170-a22b-4030-8dcd-3af0902ccb87}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Ressourcendateien\resources\icons">
       <UniqueIdentifier>{7b972191-35af-43f6-bde3-ea338e72e65e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Ressourcendateien\icons">
       <UniqueIdentifier>{e8d76bbd-eb14-4635-8db4-beb364f00a0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ressourcendateien\bin">
+      <UniqueIdentifier>{f6f51170-a22b-4030-8dcd-3af0902ccb87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ressourcendateien\bin\win64">
+      <UniqueIdentifier>{432d27d5-e51a-41c8-b960-250ab11f675a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -70,15 +73,6 @@
     <None Include="treadmill\resources\settings\default.vrsettings">
       <Filter>Ressourcendateien\resources\settings</Filter>
     </None>
-    <None Include="OmniBridge\bin\Release\net10.0\win-x64\OmniBridge.dll">
-      <Filter>Ressourcendateien\bin</Filter>
-    </None>
-    <None Include="OmniBridge\bin\Release\net10.0\win-x64\OmniCommon.dll">
-      <Filter>Ressourcendateien\bin</Filter>
-    </None>
-    <None Include="..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\treadmill\bin\win64\driver_treadmill.dll">
-      <Filter>Ressourcendateien\bin</Filter>
-    </None>
     <None Include="README.md" />
     <None Include="usage.md" />
     <None Include="treadmill\resources\icons\treadmill.svg">
@@ -86,6 +80,15 @@
     </None>
     <None Include="treadmill\driver.vrdrivermanifest">
       <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="treadmill\bin\win64\driver_treadmill.dll">
+      <Filter>Ressourcendateien\bin\win64</Filter>
+    </None>
+    <None Include="treadmill\bin\win64\OmniBridge.dll">
+      <Filter>Ressourcendateien\bin\win64</Filter>
+    </None>
+    <None Include="treadmill\bin\win64\OmniCommon.dll">
+      <Filter>Ressourcendateien\bin\win64</Filter>
     </None>
   </ItemGroup>
 </Project>

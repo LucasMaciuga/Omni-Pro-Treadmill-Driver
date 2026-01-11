@@ -142,10 +142,10 @@
     <ClInclude Include="TreadmillServerDriver.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\treadmill\bin\win64\driver_treadmill.dll" />
-    <None Include="OmniBridge\bin\Release\net10.0\win-x64\OmniBridge.dll" />
-    <None Include="OmniBridge\bin\Release\net10.0\win-x64\OmniCommon.dll" />
     <None Include="README.md" />
+    <None Include="treadmill\bin\win64\driver_treadmill.dll" />
+    <None Include="treadmill\bin\win64\OmniBridge.dll" />
+    <None Include="treadmill\bin\win64\OmniCommon.dll" />
     <None Include="treadmill\driver.vrdrivermanifest" />
     <None Include="treadmill\resources\icons\treadmill.svg" />
     <None Include="treadmill\resources\input\bindings_treadmill_controller.json" />
