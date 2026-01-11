@@ -83,5 +83,6 @@
       <Filter>Ressourcendateien\bin</Filter>
     </None>
     <None Include="README.md" />
+    <None Include="usage.md" />
   </ItemGroup>
 </Project>
