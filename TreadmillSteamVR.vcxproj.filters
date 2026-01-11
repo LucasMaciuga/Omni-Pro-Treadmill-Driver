@@ -22,11 +22,11 @@
     <Filter Include="Ressourcendateien\resources\settings">
       <UniqueIdentifier>{3da02f1b-c69e-48f0-b99d-d6f4f4365765}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Ressourcendateien\resources\icons">
-      <UniqueIdentifier>{e869e43e-2b98-4a05-9148-e44273488a75}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Ressourcendateien\bin">
       <UniqueIdentifier>{f6f51170-a22b-4030-8dcd-3af0902ccb87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ressourcendateien\resources\icons">
+      <UniqueIdentifier>{7b972191-35af-43f6-bde3-ea338e72e65e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -70,9 +70,6 @@
     <None Include="..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\treadmill\driver.vrdrivermanifest">
       <Filter>Ressourcendateien</Filter>
     </None>
-    <None Include="..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\treadmill\resources\icons\treadmill.svg">
-      <Filter>Ressourcendateien\resources\icons</Filter>
-    </None>
     <None Include="OmniBridge\bin\Release\net10.0\win-x64\OmniBridge.dll">
       <Filter>Ressourcendateien\bin</Filter>
     </None>
@@ -84,5 +81,8 @@
     </None>
     <None Include="README.md" />
     <None Include="usage.md" />
+    <None Include="treadmill\resources\icons\treadmill.svg">
+      <Filter>Ressourcendateien\resources\icons</Filter>
+    </None>
   </ItemGroup>
 </Project>
