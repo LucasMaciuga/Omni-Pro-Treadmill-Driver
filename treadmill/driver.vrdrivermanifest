@@ -1,0 +1,10 @@
+{
+  "name": "treadmill",
+  "author": "Lucas",
+  "version": "1.0.0",
+  "driver_path": "",
+  "resourceOnly": false,
+  "description": "Treadmill X/Y driver",
+  "alwaysActivate": true,
+  "hmd_presence": []
+}
