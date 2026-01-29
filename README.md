@@ -2,6 +2,25 @@
 
 A SteamVR driver for the Virtuix Omni Treadmill that translates real-world treadmill motion into VR controller input and tracked device orientation. Enables natural omnidirectional movement in VR games through actual treadmill walking.
 
+## Installation
+
+1. Copy driver folder to: `C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\treadmill\`
+2. Verify file structure:
+   ```
+   treadmill/
+   ├── bin/win64/
+   │   ├── driver_treadmill.dll
+   │   ├── OmniBridge.dll
+   │   └── OmniCommon.dll
+   ├── resources/
+   │   ├── settings/default.vrsettings
+   │   └── input/treadmill_profile.json
+   └── driver.vrdrivermanifest
+   ```
+3. Restart SteamVR
+4. Check driver console for connection status
+
+
 ## Overview
 
 **TreadmillSteamVR** is a native C++ SteamVR driver that bridges the Virtuix Omni Treadmill's motion sensors with SteamVR's input and tracking systems. By dynamically loading the OmniBridge .NET assembly, it captures real-time motion data (ring angle, step count, gamepad input) and transforms it into:
@@ -726,25 +745,6 @@ dotnet build OmniBridge/OmniBridge.csproj -c Release
 
 # 4. Restart SteamVR
 ```
-
-### Installation
-
-1. Copy driver folder to: `C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\treadmill\`
-2. Verify file structure:
-   ```
-   treadmill/
-   ├── bin/win64/
-   │   ├── driver_treadmill.dll
-   │   ├── OmniBridge.dll
-   │   └── OmniCommon.dll
-   ├── resources/
-   │   ├── settings/default.vrsettings
-   │   └── input/treadmill_profile.json
-   └── driver.vrdrivermanifest
-   ```
-3. Restart SteamVR
-4. Check driver console for connection status
-
 ---
 
 ## Future Enhancements
