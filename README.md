@@ -4,9 +4,10 @@ A SteamVR driver for the Virtuix Omni Treadmill that translates real-world tread
 
 ## Installation
 
-1. You need http://content.omniverse.global/Omni_Connect_1_3_4_0.exe installed before
-2. Copy driver folder to: `C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\treadmill\` (C:\Program Files (x86)\Steam is the default installation directory. If you have installed it somewhere else you need to take care of this)
-3. Verify file structure:
+1. You need http://content.omniverse.global/Omni_Connect_1_3_4_0.exe installed before you can use this driver
+2. Get the newest release of the driver from [here](https://github.com/LucasMaci/Omni-Pro-Treadmill-Driver/releases) (you can use the zip or 7z file)
+3. Copy driver folder to: `C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\treadmill\` (C:\Program Files (x86)\Steam is the default installation directory. If you have installed it somewhere else you need to take care of this)
+4. Verify file structure:
    ```
    treadmill/
    ├── bin/win64/
@@ -18,7 +19,7 @@ A SteamVR driver for the Virtuix Omni Treadmill that translates real-world tread
    │   └── input/treadmill_profile.json
    └── driver.vrdrivermanifest
    ```
-4. Configure **File**: `treadmill/resources/settings/default.vrsettings` as described below. (at least set "com_port" and verify "omnibridge_dll_path")
+5. Configure **File**: `treadmill/resources/settings/default.vrsettings` as described below. (at least set "com_port" and verify "omnibridge_dll_path")
 6. Restart SteamVR
 7. Check driver console for connection status
 
