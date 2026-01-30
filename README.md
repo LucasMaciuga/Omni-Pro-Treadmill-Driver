@@ -4,8 +4,9 @@ A SteamVR driver for the Virtuix Omni Treadmill that translates real-world tread
 
 ## Installation
 
-1. Copy driver folder to: `C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\treadmill\`
-2. Verify file structure:
+1. You need http://content.omniverse.global/Omni_Connect_1_3_4_0.exe installed before
+2. Copy driver folder to: `C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\treadmill\` (C:\Program Files (x86)\Steam is the default installation directory. If you have installed it somewhere else you need to take care of this)
+3. Verify file structure:
    ```
    treadmill/
    ├── bin/win64/
@@ -17,9 +18,34 @@ A SteamVR driver for the Virtuix Omni Treadmill that translates real-world tread
    │   └── input/treadmill_profile.json
    └── driver.vrdrivermanifest
    ```
-3. Restart SteamVR
-4. Check driver console for connection status
+4. Configure **File**: `treadmill/resources/settings/default.vrsettings` as described below. (at least set "com_port" and verify "omnibridge_dll_path")
+6. Restart SteamVR
+7. Check driver console for connection status
 
+### Configuration (Settings)
+There are a few settings which needs to be set in the  **File**: `treadmill/resources/settings/default.vrsettings`.
+
+#### COM Port
+This must be set to the port your Omni Treadmill is using.
+You find it by opening "devicemanager" and check what your "Omni Serial Command Port" has behind it (by me it was "COM3"
+<img width="637" height="408" alt="image" src="https://github.com/user-attachments/assets/79a01826-f79b-48d5-b233-0f46836f6a77" />
+
+#### Omni Bridge DLL Path
+The OmniBridge.dll is needed by the SteamVR driver, but currently is not autodetected. So set it manualy under "omnibridge_dll_path".
+**Take care that the path must be absolut and you need to put double backslashes instead of single backslahses**
+
+
+```json
+{
+  "driver_treadmill": {
+    "com_port": "COM3",
+    "omnibridge_dll_path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\SteamVR\\drivers\\treadmill\\bin\\win64\\OmniBridge.dll",
+    "debug": true,
+    "speed_factor": 1.0,
+    "smoothing_factor": 0.3
+  }
+}
+```
 
 ## Overview
 
@@ -479,22 +505,6 @@ void OnOmniData(float ringAngle, int gamePadX, int gamePadY)
 │   └─ Calculates final movement direction                │
 │      = Joystick vector rotated by controller            │
 └─────────────────────────────────────────────────────────┘
-```
-
-### Configuration (Settings)
-
-**File**: `treadmill/resources/settings/default.vrsettings`
-
-```json
-{
-  "driver_treadmill": {
-    "com_port": "COM3",
-    "omnibridge_dll_path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\SteamVR\\drivers\\treadmill\\bin\\win64\\OmniBridge.dll",
-    "debug": true,
-    "speed_factor": 1.0,
-    "smoothing_factor": 0.3
-  }
-}
 ```
 
 **Runtime Adjustments** (DebugRequest):
