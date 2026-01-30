@@ -27,7 +27,7 @@ There are a few settings which needs to be set in the  **File**: `treadmill/reso
 
 #### COM Port
 This must be set to the port your Omni Treadmill is using.
-You find it by opening "devicemanager" and check what your "Omni Serial Command Port" has behind it (by me it was "COM3"
+You find it by opening "devicemanager" and check what your "Omni Serial Command Port" has behind it (by me it was "COM3")
 <img width="637" height="408" alt="image" src="https://github.com/user-attachments/assets/79a01826-f79b-48d5-b233-0f46836f6a77" />
 
 #### Omni Bridge DLL Path
