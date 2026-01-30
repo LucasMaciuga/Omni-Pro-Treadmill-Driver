@@ -49,8 +49,10 @@ The OmniBridge.dll is needed by the SteamVR driver, but currently is not autodet
 ```
 
 ### Configuration (in-Game movement)
+In SteamVR you need to bind the treadmill movement to the game, because this is a custom solution and no default will handle that for you. Currently tested for SkyrimVR a "legacy-binding-game" and No Man's Sky a "modern-binding-game". 
 
-In SteamVR you need to bind the treadmill movement to the game, because this is a custom solution and no default will handle that for you. Currently tested for SkyrimVR a "legacy-binding-game". That means it is the old way how SteamVR bounds the treadmill to the correct action in the game.
+#### Legacy-Mode (the old, the SkyrimVR way)
+This is the old way how SteamVR binds the treadmill to the correct action in the game.
 
 - Open the "controller bindings" (sorry for the german pictures, but I have no idea how to switch it to english)
   - <img width="799" height="629" alt="image" src="https://github.com/user-attachments/assets/196c0ac2-ba49-4e8d-a93e-5b7c729a3c52" />
@@ -67,6 +69,16 @@ In SteamVR you need to bind the treadmill movement to the game, because this is 
   - <img width="1483" height="851" alt="image" src="https://github.com/user-attachments/assets/e0f1dbe9-e56c-44f4-b87a-74a8a78510b7" />
 - **This is important** After this, go to the additional settings and check "forward binding to the left hand" and also "forward binding to the right hand". You need it, because else the normal controller migth be ignored completely
   -  <img width="1484" height="671" alt="image" src="https://github.com/user-attachments/assets/fd0d9bcb-e73b-4f88-91a5-3a12caf9837d" />
+
+
+#### Modern Mode (the new, the No Man's Sky way)
+This is the new way how SteamVR binds the treadmill to the correct action in the game.
+
+- Follow the steps as above, but just for another game (like No Man's Sky)
+- After you followed it to the step "Now click "edit" to change or add binding", in modern games the binding will look much different, but no panic, just look for "by foot" and add the joystick, add the action and select "move"
+  - <img width="1940" height="1073" alt="image" src="https://github.com/user-attachments/assets/7e9d30fb-f7b3-47d9-a829-caf0d6d9f700" />
+- That was it you should be ready "to-go"
+
 
 ## Troubleshooting
 
