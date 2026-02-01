@@ -1,0 +1,12 @@
+{
+    "file_format_version": "1.0.0",
+    "api_layer": {
+        "name": "XR_APILAYER_NOVENDOR_treadmill_locomotion",
+        "library_path": ".\\TreadmillOpenXRLayer.dll",
+        "api_version": "1.0",
+        "implementation_version": "1",
+        "description": "Injects Omni Pro treadmill locomotion into OpenXR applications",
+        "disable_environment": "DISABLE_TREADMILL_LAYER",
+        "enable_environment": "ENABLE_TREADMILL_LAYER"
+    }
+}

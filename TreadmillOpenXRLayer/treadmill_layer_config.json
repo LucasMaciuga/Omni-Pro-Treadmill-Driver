@@ -1,0 +1,40 @@
+{
+    // TreadmillOpenXRLayer Configuration
+    // ===================================
+    // This file should be placed in the same directory as the layer DLL
+    
+    "enabled": true,
+    
+    // Treadmill Connection
+    "comPort": "COM3",
+    "baudRate": 115200,
+    
+    // Movement Settings
+    "speedMultiplier": 1.5,
+    "deadzone": 0.1,
+    "smoothing": 0.3,
+    
+    // Input Mode:
+    // - "override": Treadmill replaces controller input when active
+    // - "additive": Treadmill adds to controller input
+    // - "smart": Override only when treadmill input is detected
+    "inputMode": "smart",
+    
+    // Action Patterns
+    // Actions matching these patterns will receive treadmill input
+    "actionPatterns": [
+        "*move*",
+        "*locomotion*",
+        "*walk*",
+        "*thumbstick*"
+    ],
+    
+    // Target Input Paths (OpenXR-specific)
+    "targetPaths": [
+        "/user/hand/left/input/thumbstick",
+        "/user/hand/left/input/trackpad"
+    ],
+    
+    // Debug
+    "debugLog": true
+}

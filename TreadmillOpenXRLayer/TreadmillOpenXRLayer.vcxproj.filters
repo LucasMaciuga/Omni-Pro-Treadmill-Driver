@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="layer_main.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="openxr_interceptor.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="treadmill_input.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="openxr_layer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="treadmill_input.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+    <None Include="install.bat">
+      <Filter>Ressourcen</Filter>
+    </None>
+    <None Include="treadmill_layer_config.json">
+      <Filter>Ressourcen</Filter>
+    </None>
+    <None Include="uninstall.bat">
+      <Filter>Ressourcen</Filter>
+    </None>
+    <None Include="XR_APILAYER_NOVENDOR_treadmill_locomotion.json">
+      <Filter>Ressourcen</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{538e3700-802d-431d-b02f-3e1733e22aff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{166f43f1-3a6f-44b3-ada3-aeb5bb9eaf93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ressourcen">
+      <UniqueIdentifier>{fc9bb9ac-f6d1-4695-9221-21b6aec07789}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

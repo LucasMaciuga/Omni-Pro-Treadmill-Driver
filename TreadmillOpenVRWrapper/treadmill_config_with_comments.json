@@ -1,0 +1,36 @@
+{
+  // TreadmillOpenVRWrapper Configuration
+  // =====================================
+  // Place this file next to openvr_api.dll in the game folder
+
+  "enabled": true,
+
+  // Treadmill Connection
+  "comPort": "COM3",
+  "baudRate": 115200,
+
+  // Movement Settings
+  "speedMultiplier": 1.5,
+  "deadzone": 0.1,
+  "smoothing": 0.3,
+
+  // Input Mode:
+  // - "override": Treadmill replaces controller input when active
+  // - "additive": Treadmill adds to controller input
+  // - "smart": Override only when treadmill input is detected
+  "inputMode": "additive",
+
+  // Action Patterns
+  // Actions matching these patterns will receive treadmill input
+  // Use * as wildcard
+  "actionPatterns": [
+    "*move*",
+    "*locomotion*",
+    "*walk*",
+    "*thumbstick*",
+    "/actions/*/in/Move"
+  ],
+
+  // Debug
+  "debugLog": true
+}

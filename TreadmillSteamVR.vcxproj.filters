@@ -90,5 +90,14 @@
     <None Include="treadmill\bin\win64\OmniCommon.dll">
       <Filter>Ressourcendateien\bin\win64</Filter>
     </None>
+    <None Include="deploy_omnibridge.ps1" />
+    <None Include="deploy_to_mo2.ps1" />
+    <None Include="create_mo2_package.ps1" />
+    <None Include="setup_treadmill_wrapper.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\..\..\Modlists\MGON\mods\VRIK Rift-Index-WMR Controller Bindings - Grip to Interact\Interface\Controls\PC\controlmapvr.txt">
+      <Filter>Ressourcendateien\resources</Filter>
+    </Text>
   </ItemGroup>
 </Project>

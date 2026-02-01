@@ -142,7 +142,11 @@
     <ClInclude Include="TreadmillServerDriver.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="create_mo2_package.ps1" />
+    <None Include="deploy_omnibridge.ps1" />
+    <None Include="deploy_to_mo2.ps1" />
     <None Include="README.md" />
+    <None Include="setup_treadmill_wrapper.ps1" />
     <None Include="treadmill\bin\win64\driver_treadmill.dll" />
     <None Include="treadmill\bin\win64\OmniBridge.dll" />
     <None Include="treadmill\bin\win64\OmniCommon.dll" />
@@ -154,6 +158,9 @@
     <None Include="treadmill\resources\input\treadmill_profile.json" />
     <None Include="treadmill\resources\settings\default.vrsettings" />
     <None Include="usage.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\..\..\Modlists\MGON\mods\VRIK Rift-Index-WMR Controller Bindings - Grip to Interact\Interface\Controls\PC\controlmapvr.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

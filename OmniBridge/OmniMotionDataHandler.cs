@@ -1,6 +1,7 @@
 using System.IO.Ports;
 using OmniCommon;
 using OmniCommon.Messages;
+using OmniBridge;
 
 /// <summary>
 /// Manages the configuration and reception of OmniMotionDataMessage
@@ -14,6 +15,8 @@ public class OmniMotionDataHandler : IDisposable
     private readonly int _configurationDelayMs;
     private OmniMode _currentMode = OmniMode.DecoupledForwardBackStrafe;
     private int _crcErrorCount = 0;
+    private int _packetCount = 0;
+    private int _bytesReadTotal = 0;
 
     /// <summary>
     /// Event is raised when motion data is received
@@ -81,15 +84,16 @@ public class OmniMotionDataHandler : IDisposable
         {
             if (_port.IsOpen)
             {
-                Console.WriteLine("Port is already open.");
+                Logger.Debug("Port is already open.");
                 return true;
             }
+
 
             // Check if port exists
             if (!ComPortHelper.IsPortAvailable(PortName))
             {
                 var error = $"COM port '{PortName}' does not exist on this system!";
-                Console.WriteLine(error);
+                Logger.Error(error);
                 ConnectionError?.Invoke(this, error);
                 return false;
             }
@@ -98,22 +102,24 @@ public class OmniMotionDataHandler : IDisposable
             if (!ComPortHelper.CanAccessPort(PortName, BaudRate))
             {
                 var error = $"COM port '{PortName}' is not accessible (possibly used by another program)!";
-                Console.WriteLine(error);
+                Logger.Error(error);
                 ConnectionError?.Invoke(this, error);
                 return false;
             }
 
             _port.Open();
-            Console.WriteLine($"Connected to {_port.PortName} @ {_port.BaudRate} baud");
+            Logger.Debug($"Connect: Port opened - {_port.PortName} @ {_port.BaudRate} baud");
 
             // Set OmniMode (use settings mode or keep current)
             var modeToSet = omniMode ?? _currentMode;
+            Logger.Debug($"Connect: Setting OmniMode to {modeToSet}");
             SetMode(modeToSet);
 
             Thread.Sleep(_configurationDelayMs); // Wait for hardware response
 
             // Configure Motion Data (default: enable all)
             var motionSelection = selection ?? MotionDataSelection.AllOn();
+            Logger.Debug($"Connect: Configuring MotionData - RingAngle={motionSelection.RingAngle}, GamePadData={motionSelection.GamePadData}");
             ConfigureMotionData(motionSelection);
 
             Thread.Sleep(_configurationDelayMs); // Wait for hardware response
@@ -122,32 +128,25 @@ public class OmniMotionDataHandler : IDisposable
             _isRunning = true;
             _readerThread.Start();
 
-            Console.WriteLine("Motion Data streaming enabled.");
+            Logger.Debug("Connect: Reader thread started");
             return true;
         }
         catch (UnauthorizedAccessException ex)
         {
-            var error = $"Access denied to {PortName}: {ex.Message}";
-            Console.WriteLine(error);
-            Console.WriteLine("Possible causes:");
-            Console.WriteLine("  - Port is used by another program");
-            Console.WriteLine("  - Insufficient permissions");
-            Console.WriteLine("  - USB device not properly connected");
-            ConnectionError?.Invoke(this, error);
+            Logger.Error($"Access denied to {PortName}", ex);
+            ConnectionError?.Invoke(this, ex.Message);
             return false;
         }
         catch (IOException ex)
         {
-            var error = $"I/O error when opening {PortName}: {ex.Message}";
-            Console.WriteLine(error);
-            ConnectionError?.Invoke(this, error);
+            Logger.Error($"I/O error opening {PortName}", ex);
+            ConnectionError?.Invoke(this, ex.Message);
             return false;
         }
         catch (Exception ex)
         {
-            var error = $"Connection error: {ex.Message}";
-            Console.WriteLine(error);
-            ConnectionError?.Invoke(this, error);
+            Logger.Error("Connection error", ex);
+            ConnectionError?.Invoke(this, ex.Message);
             return false;
         }
     }
@@ -168,7 +167,7 @@ public class OmniMotionDataHandler : IDisposable
         var message = new OmniChangeGamepadModeMessage((byte)mode);
         SendMessage(message);
 
-        Console.WriteLine($"OmniMode set: {mode} ({(int)mode})");
+        Logger.Debug($"OmniMode set: {mode} ({(int)mode})");
 
         ModeChanged?.Invoke(this, mode);
     }
@@ -186,14 +185,7 @@ public class OmniMotionDataHandler : IDisposable
         var message = new OmniSetMotionDataMessage(selection);
         SendMessage(message);
 
-        Console.WriteLine("Motion Data configuration sent:");
-        Console.WriteLine($"  - Timestamp: {selection.Timestamp}");
-        Console.WriteLine($"  - StepCount: {selection.StepCount}");
-        Console.WriteLine($"  - RingAngle: {selection.RingAngle}");
-        Console.WriteLine($"  - RingDelta: {selection.RingDelta}");
-        Console.WriteLine($"  - GamePadData: {selection.GamePadData}");
-        Console.WriteLine($"  - GunButtonData: {selection.GunButtonData}");
-        Console.WriteLine($"  - StepTrigger: {selection.StepTrigger}");
+        Logger.Debug($"Motion Data config: Timestamp={selection.Timestamp}, StepCount={selection.StepCount}, RingAngle={selection.RingAngle}, GamePadData={selection.GamePadData}");
     }
 
     /// <summary>
@@ -231,7 +223,7 @@ public class OmniMotionDataHandler : IDisposable
         {
             if (!_readerThread.Join(1000))
             {
-                Console.WriteLine("Warning: Reader thread could not be terminated cleanly.");
+                Logger.Debug("Warning: Reader thread could not be terminated cleanly.");
             }
         }
 
@@ -247,11 +239,11 @@ public class OmniMotionDataHandler : IDisposable
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error disabling streaming: {ex.Message}");
+                Logger.Error($"Error disabling streaming: {ex.Message}");
             }
 
             _port.Close();
-            Console.WriteLine("Disconnected.");
+            Logger.Info("Disconnected from treadmill.");
         }
     }
 
@@ -266,6 +258,7 @@ public class OmniMotionDataHandler : IDisposable
 
     private void ReadLoop()
     {
+        Logger.Debug("ReadLoop: Thread started");
         byte[] buffer = new byte[256];
 
         while (_isRunning)
@@ -280,6 +273,8 @@ public class OmniMotionDataHandler : IDisposable
                     {
                         bytesRead = _port.Read(buffer, 0, Math.Min(_port.BytesToRead, buffer.Length));
                     }
+                    
+                    _bytesReadTotal += bytesRead;
 
                     // Fire Raw Hex Event
                     OnRawHexDataReceived(buffer, bytesRead);
@@ -289,13 +284,20 @@ public class OmniMotionDataHandler : IDisposable
 
                     if (msg != null)
                     {
+                        _packetCount++;
+                        
+                        // Log every 100th packet (debug only)
+                        if (_packetCount < 5 || _packetCount % 100 == 0)
+                        {
+                            Logger.Trace($"ReadLoop: Packet #{_packetCount} (bytes: {_bytesReadTotal}, CRC errors: {_crcErrorCount})");
+                        }
+                        
                         ProcessMessage(msg);
                     }
                     else
                     {
-                        // CRC error: count instead of output
+                        // CRC or parsing error - this is normal for fragmented reads
                         _crcErrorCount++;
-                        CrcErrorOccurred?.Invoke(this, EventArgs.Empty);
                     }
                 }
 
@@ -307,28 +309,38 @@ public class OmniMotionDataHandler : IDisposable
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Read error: {ex.Message}");
+                Logger.Error("ReadLoop exception", ex);
                 Thread.Sleep(100);
             }
         }
+        
+        Logger.Debug($"ReadLoop: Thread ended. Bytes: {_bytesReadTotal}, Packets: {_packetCount}, CRC errors: {_crcErrorCount}");
     }
+
 
     private void ProcessMessage(OmniBaseMessage msg)
     {
         if (msg.ErrorCode != 0)
         {
-            Console.WriteLine($"Hardware error code: {msg.ErrorCode}");
+            Logger.Debug($"ProcessMessage: Hardware error code {msg.ErrorCode}");
         }
 
         if (msg.MsgType == MessageType.OmniMotionDataMessage)
         {
             var motionMsg = new OmniMotionDataMessage(msg);
             var motionData = motionMsg.GetMotionData();
+            
+            // Log first few motion data packets (debug only)
+            if (_packetCount <= 5)
+            {
+                Logger.Trace($"ProcessMessage: MotionData - RingAngle={motionData.RingAngle:F1}, GamePad=({motionData.GamePad_X},{motionData.GamePad_Y})");
+            }
+            
             OnMotionDataReceived(motionData);
         }
         else
         {
-            Console.WriteLine($"Unexpected message type received: {msg.MsgType}");
+            Logger.Debug($"ProcessMessage: Unexpected message type {msg.MsgType}");
         }
     }
 

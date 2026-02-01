@@ -11,9 +11,12 @@
     <PlatformTarget>x64</PlatformTarget>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <PublishAot>true</PublishAot>
-    <TrimMode>link</TrimMode>
-    <IlcOptimizationPreference>Size</IlcOptimizationPreference>
+    <TrimMode>partial</TrimMode>
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <EventSourceSupport>false</EventSourceSupport>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <StackTraceSupport>false</StackTraceSupport>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +25,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OmniCommon\OmniCommon.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TrimmerRootAssembly Include="System.IO.Ports" />
   </ItemGroup>
 
 </Project>
